@@ -14,7 +14,7 @@ const merge = extendTailwindMerge({
             'xxs',
             'xs',
             'sm',
-            'md',
+            'base',
             'lg',
             'xl',
             'xxl',

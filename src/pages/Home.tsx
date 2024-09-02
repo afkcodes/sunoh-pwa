@@ -11,7 +11,7 @@ const Home = () => {
 
   return (
     <div className='w-full h-full bg-background'>
-      <div className='grid w-full h-full grid-cols-2 justify-items-center'>
+      <div className='z-0 grid w-full grid-cols-2 gap-8 pt-2'>
         {[1, 2, 3, 4, 8, 5, 6, 55, 6, 77, 88, 888, 8888, 12].map((item) => (
           <Tile
             onClick={() => {
@@ -21,16 +21,17 @@ const Home = () => {
             figureConfig={{
               fit: 'cover',
               radius: 'xxxs',
-              size: 'xxl',
+              size: 'full',
+              mode: 'multi',
             }}
             titleConfig={{
               color: 'primary',
-              size: 'sm',
+              size: 'md',
               weight: 'medium',
             }}
             subTitleConfig={{
               color: 'light',
-              size: 'xs',
+              size: 'sm',
             }}
             data={{
               image:

@@ -12,33 +12,42 @@ const Figure: React.FC<FigureProps> = ({
   loading = 'lazy',
   fit = 'cover',
   dominantColor = '',
+  mode = 'single',
+  position = 'center',
 }) => {
-  const className = merge(figureStyles({ radius, size }));
+  const className = merge(figureStyles({ radius, size }), 'aspect-square');
   const [loadStatus, setLoadStatus] = useState<SetStateAction<ImageStatus>>('LOADING');
 
   return (
     <figure className={className} tabIndex={0} style={{ backgroundColor: dominantColor }}>
-      {/* <Image
-        src={src}
-        alt={alt}
-        loading={loading}
-        fit={fit}
-        setLoadStatus={setLoadStatus}
-      /> */}
-      <div className='grid grid-cols-2'>
-        {[1, 2, 3, 4].map((item) => {
-          return (
-            <Image
-              key={item}
-              src={src}
-              alt={alt}
-              loading={loading}
-              fit={fit}
-              setLoadStatus={setLoadStatus}
-            />
-          );
-        })}
-      </div>
+      {mode === 'single' ? (
+        <Image
+          src={src}
+          alt={alt}
+          loading={loading}
+          fit={fit}
+          setLoadStatus={setLoadStatus}
+          position={position}
+        />
+      ) : (
+        <div className='flex flex-wrap w-full h-full overflow-hidden '>
+          {[1, 2, 3, 4].map((item) => {
+            return (
+              <div key={item} className='w-1/2 h-1/2'>
+                <Image
+                  src={src}
+                  alt={alt}
+                  loading={loading}
+                  fit={fit}
+                  setLoadStatus={setLoadStatus}
+                  position={position}
+                />
+              </div>
+            );
+          })}
+        </div>
+      )}
+
       <div
         className={
           loadStatus === 'LOADING'

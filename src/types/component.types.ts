@@ -8,6 +8,17 @@ export type FitStrategy = 'default' | 'fill' | 'contain' | 'cover' | 'scale_down
 export type ArrangeMode = 'single' | 'multi';
 export type ImageLoading = 'eager' | 'lazy' | undefined;
 export type ImageStatus = 'LOADING' | 'SUCCESS' | 'ERROR';
+export type ImageMode = 'multi' | 'single';
+export type ObjectPosition =
+  | 'top'
+  | 'left'
+  | 'right'
+  | 'bottom'
+  | 'center'
+  | 'right-top'
+  | 'right-bottom'
+  | 'left-top'
+  | 'left-bottom';
 
 // Button types
 export interface ButtonProps extends VariantProps<typeof buttonStyles> {
@@ -28,6 +39,7 @@ export interface ImageProps {
   loading?: ImageLoading;
   width?: number | string | undefined;
   fit: FitStrategy;
+  position: ObjectPosition;
   setLoadStatus?: Dispatch<SetStateAction<ImageStatus>>;
 }
 
@@ -36,8 +48,10 @@ export interface FigureProps extends VariantProps<typeof figureStyles> {
   src: string;
   alt: string;
   fit: FitStrategy;
+  position?: ObjectPosition;
   loading?: ImageLoading;
   dominantColor?: string;
+  mode?: ImageMode;
 }
 
 // TextLink Types

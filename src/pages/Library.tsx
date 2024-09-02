@@ -17,6 +17,7 @@ const Library = () => {
               fit: 'cover',
               radius: 'xxxs',
               size: 'xxl',
+              position: 'top',
             }}
             titleConfig={{
               color: 'primary',

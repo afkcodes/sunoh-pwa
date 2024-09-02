@@ -1,4 +1,4 @@
-import { FitStrategy } from '../../types/component.types';
+import { FitStrategy, ObjectPosition } from '../../types/component.types';
 
 const fitStrategy: {
   [key in FitStrategy]: string;
@@ -10,4 +10,16 @@ const fitStrategy: {
   scale_down: 'object-scale-down',
 };
 
-export { fitStrategy };
+const imgPosition: { [key in ObjectPosition]: string } = {
+  top: 'object-top',
+  left: 'object-left',
+  right: 'object-right',
+  bottom: 'object-bottom',
+  center: 'object-center',
+  'right-top': 'object-right-top',
+  'right-bottom': 'object-right-bottom-',
+  'left-top': 'object-left-top',
+  'left-bottom': 'object-left-bottom',
+};
+
+export { fitStrategy, imgPosition };

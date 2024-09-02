@@ -8,7 +8,7 @@ export const textStyles = cva(
         xxs: 'text-xxs',
         xs: 'text-xs',
         sm: 'text-sm',
-        md: 'text-md',
+        md: 'text-base',
         lg: 'text-lg',
         xl: 'text-xl',
         xxl: 'text-xxl',

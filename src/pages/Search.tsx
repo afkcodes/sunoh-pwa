@@ -7,16 +7,15 @@ const Search = () => {
   const navigate = useViewTransition();
 
   return (
-    <div className='py-2'>
-      <div className='sticky top-0 z-20 px-2'>
-        <Input
-          placeholder='Hello Input'
-          suffixIcon={<RiSearch2Line size={26} className='text-text-secondary' />}
-        />
-      </div>
-      <div className=' bg-background'>
-        <div className='z-0 grid items-center justify-center w-full grid-cols-2 justify-items-center'>
-          {[1, 2, 3, 4, 8, 5, 6].map((item) => (
+    <div className='w-full px-2 py-2'>
+      <Input
+        placeholder='Hello Input'
+        suffixIcon={<RiSearch2Line size={26} className='text-text-secondary' />}
+      />
+
+      <div className='z-0 grid w-full grid-cols-2 gap-8 pt-2'>
+        {[1, 2, 3, 4, 8, 5, 6].map((item, idx) => (
+          <div className={`${idx % 2 !== 0 ? 'justify-self-end' : ''}`}>
             <Tile
               onClick={() => {
                 navigate('/home');
@@ -25,11 +24,12 @@ const Search = () => {
               figureConfig={{
                 fit: 'cover',
                 radius: 'xxxs',
-                size: 'xxl',
+                size: 'full',
+                position: 'top',
               }}
               titleConfig={{
                 color: 'primary',
-                size: 'sm',
+                size: 'md',
                 weight: 'medium',
               }}
               subTitleConfig={{
@@ -48,14 +48,14 @@ const Search = () => {
                 subtitle: 'subtitle',
               }}
             />
-          ))}
-        </div>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Temporibus cum
-          doloribus autem, exercitationem omnis quo ipsa ipsam ratione consectetur est
-          aliquam doloremque accusantium vitae minima et tempore illo velit ex.
-        </p>
+          </div>
+        ))}
       </div>
+      <p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Temporibus cum doloribus
+        autem, exercitationem omnis quo ipsa ipsam ratione consectetur est aliquam
+        doloremque accusantium vitae minima et tempore illo velit ex.
+      </p>
     </div>
   );
 };
