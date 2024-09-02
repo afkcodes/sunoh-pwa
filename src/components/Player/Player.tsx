@@ -93,13 +93,16 @@ const PlayerScreen = () => {
         <Button
           onClick={() => {}}
           variant='unstyled'
-          classNames='transition-colors text-text-primary active:text-text-primary active:scale-95'>
+          classNames='transition-colors text-text-primary active:text-text-primary active:scale-95 p-0 m-0'>
           <RiListUnordered size={24} />
         </Button>
         <span className='text-sm font-medium'>NOW PLAYING</span>
-        <button className='transition-colors text-text-primary active:text-text-primary active:scale-95'>
+        <Button
+          onClick={() => {}}
+          variant='unstyled'
+          classNames='p-0 m-0 transition-colors text-text-primary active:text-text-primary active:scale-95'>
           <RiMusic2Line size={24} />
-        </button>
+        </Button>
       </div>
 
       {/* Main Content */}
@@ -160,7 +163,9 @@ const PlayerScreen = () => {
         {/* Lyrics */}
         {showLyrics && (
           <div className='w-full pl-4 overflow-y-scroll h-96'>
-            <h3 className='mb-4 text-xl font-semibold'>Lyrics</h3>
+            <TextLink weight='semibold' size='xl' classNames='mt-2'>
+              Lyrics
+            </TextLink>
             <TextLink size='sm' classNames='whitespace-pre-line' lineCount='none'>
               {trackData?.lyrics || 'Lyrics not available'}
             </TextLink>

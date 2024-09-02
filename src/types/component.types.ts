@@ -79,3 +79,11 @@ export interface ModalProps {
   role?: Role;
   closeOnOutsidePress?: boolean;
 }
+
+export interface BottomSheetProps {
+  isOpen: boolean;
+  name: string;
+  children: React.ReactNode;
+  onClose?: () => void;
+  dismissible?: boolean;
+}
