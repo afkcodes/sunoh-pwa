@@ -15,7 +15,7 @@ const BottomNavContainer = () => {
   };
 
   return (
-    <div className='fixed left-0 right-0 flex items-center justify-around w-full h-16 bg-nav-background/90 backdrop-blur-sm bottom-nav-container'>
+    <div className='flex items-center justify-around h-16 bg-nav-background/90 bottom-nav-container backdrop-blur-md'>
       {navItems.map((item: NavItems) => (
         <div
           key={item.id}

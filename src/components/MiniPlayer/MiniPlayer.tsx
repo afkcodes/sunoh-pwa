@@ -42,7 +42,7 @@ const MiniPlayer = () => {
             children: <PlayerScreen />,
           });
         }}
-        className='fixed left-0 right-0 overflow-hidden bg-nav-background bottom-16 mini-player'>
+        className='fixed left-0 right-0 overflow-hidden bg-nav-background/90 backdrop-blur-md bottom-16 mini-player'>
         <motion.div
           className='relative max-w-lg mx-auto'
           variants={backgroundVariants}
@@ -127,7 +127,7 @@ const MiniPlayer = () => {
                 animate={{ opacity: 1, transition: { duration: 0.4, delay: 0.1 } }}
                 exit={{ opacity: 0, transition: { duration: 0 } }}
                 transition={{ duration: 0.4 }}
-                className='absolute w-full px-4 pb-3 bg-nav-background '>
+                className='absolute w-full px-4 pb-3 bg-transparent '>
                 <div className='flex items-center justify-between mb-2'>
                   <motion.button
                     whileTap={{ scale: 0.9 }}
