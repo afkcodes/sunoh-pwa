@@ -1,9 +1,6 @@
 import { Route, Routes, useLocation } from 'react-router';
-import BottomSheet from '~components/BottomSheet/BottomSheet';
-import Equalizer from '~components/Equalizer';
-import PlayerScreen from '~components/Player/Player';
 import { LayoutContainer } from '~containers/LayoutContainer';
-import routes from './routes';
+import { modalRoutes, routes } from './routes';
 
 const Router = () => {
   const location = useLocation();
@@ -16,42 +13,16 @@ const Router = () => {
           {routes.map((route) => (
             <Route path={route.path} element={route.element} />
           ))}
-          <Route
-            path='/player'
-            element={
-              <BottomSheet isOpen name='Player sheet'>
-                <PlayerScreen />
-              </BottomSheet>
-            }
-          />
-          <Route
-            path='/eq'
-            element={
-              <BottomSheet isOpen name='Equalizer Sheet'>
-                <Equalizer />
-              </BottomSheet>
-            }
-          />
+          {modalRoutes.map((route) => (
+            <Route path={route.path} element={route.element} />
+          ))}
         </Route>
       </Routes>
       {background && (
         <Routes>
-          <Route
-            path='player'
-            element={
-              <BottomSheet isOpen name=''>
-                <PlayerScreen />
-              </BottomSheet>
-            }
-          />
-          <Route
-            path='/eq'
-            element={
-              <BottomSheet isOpen name=''>
-                <Equalizer />
-              </BottomSheet>
-            }
-          />
+          {modalRoutes.map((route) => (
+            <Route path={route.path} element={route.element} />
+          ))}
         </Routes>
       )}
     </div>

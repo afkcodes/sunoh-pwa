@@ -1,25 +1,64 @@
-import AlbumScreen from '~pages/Album';
-import Home from '~pages/Home';
-import Library from '~pages/Library';
-import Search from '~pages/Search';
+import { lazy, Suspense } from 'react';
+import BottomSheet from '~components/BottomSheet/BottomSheet';
+import PlayerScreen from '~components/Player/Player';
+
+const Home = lazy(() => import('~pages/Home'));
+const Search = lazy(() => import('~pages/Search'));
+const Library = lazy(() => import('~pages/Library'));
+const AlbumScreen = lazy(() => import('~pages/Album'));
 
 const routes = [
   {
     path: '/home',
-    element: <Home />,
+    element: (
+      <Suspense fallback={<div>loading</div>}>
+        <Home />
+      </Suspense>
+    ),
   },
   {
     path: '/search',
-    element: <Search />,
+    element: (
+      <Suspense fallback={<div>loading</div>}>
+        <Search />
+      </Suspense>
+    ),
   },
   {
     path: '/library',
-    element: <Library />,
+    element: (
+      <Suspense fallback={<div>loading</div>}>
+        <Library />
+      </Suspense>
+    ),
   },
   {
     path: '/album/:albumId',
-    element: <AlbumScreen />,
+    element: (
+      <Suspense fallback={<div>loading</div>}>
+        <AlbumScreen />
+      </Suspense>
+    ),
   },
 ];
 
-export default routes;
+const modalRoutes = [
+  {
+    path: '/player',
+    element: (
+      <BottomSheet isOpen name='Player sheet'>
+        <PlayerScreen />
+      </BottomSheet>
+    ),
+  },
+  {
+    path: '/eq',
+    element: (
+      <BottomSheet isOpen name='Player sheet'>
+        <PlayerScreen />
+      </BottomSheet>
+    ),
+  },
+];
+
+export { modalRoutes, routes };
