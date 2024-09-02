@@ -30,6 +30,7 @@ export interface ButtonProps extends VariantProps<typeof buttonStyles> {
   suffixIcon?: React.ReactNode;
   loading?: boolean;
   classNames?: string;
+  id?: string;
 }
 
 // Image types
@@ -53,6 +54,7 @@ export interface FigureProps extends VariantProps<typeof figureStyles> {
   loading?: ImageLoading;
   dominantColor?: string;
   mode?: ImageMode;
+  id?: string;
 }
 
 // TextLink Types
@@ -69,6 +71,7 @@ export interface TileProps {
   data: any;
   config: any;
   onClick: (_param?: any, _param2?: any) => void;
+  variant?: 'list' | 'tile';
 }
 
 export type Role = 'drawer' | 'modal';
@@ -126,8 +129,8 @@ export interface TileContainerProps {
   tileConfig: TileConfig;
   data: any;
   config: any;
-  onTileClick: (_param?: any, _param2?: any) => void;
-  layout?: 'scrollList' | 'grid';
+  onTileClick: (_param?: any, _param2?: any, param3?: any) => void;
+  layout?: 'scrollList' | 'grid' | 'list';
 }
 
 export type AudioItemConfig = Pick<AudioItemProps, 'type'>;

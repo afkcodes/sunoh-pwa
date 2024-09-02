@@ -1,4 +1,6 @@
 import { MediaTrack } from 'audio_x';
+import { LuHeadphones } from 'react-icons/lu';
+import { RiAlbumFill, RiMusic2Fill, RiMusicFill, RiPlayListFill } from 'react-icons/ri';
 import { Track } from '~states/audioStore';
 
 export const isValidFunction = (fun: any) => typeof fun === 'function';
@@ -6,6 +8,12 @@ export const isValidArray = (arr: any[]) => arr && Array.isArray(arr) && arr.len
 export const isValidWindow = window instanceof Window && typeof window !== 'undefined';
 export const isValidObject = (obj: any): boolean =>
   obj !== null && typeof obj === 'object' && !Array.isArray(obj);
+
+export const isEmptyObject = (obj: any): boolean =>
+  obj !== null &&
+  typeof obj === 'object' &&
+  !Array.isArray(obj) &&
+  Object.keys(obj).length > 0;
 
 export const deepCompare = (obj1: any, obj2: any): boolean => {
   // Check if the types of both objects are the same
@@ -233,39 +241,40 @@ export type MediaQuality = '12kbps' | '48kbps' | '96kbps' | '160kbps' | '320kbps
 
 export const createMediaTrack = (data: any, mediaQuality: MediaQuality): MediaTrack => {
   // Find the media URL with the specified quality
-  const selectedMediaUrl =
-    data.mediaUrls.find((url: MediaUrl) => url.quality === mediaQuality) ||
-    data.mediaUrls[data.mediaUrls.length - 1];
+  const selectedMediaUrl = data?.mediaUrls
+    ? data.mediaUrls.find((url: MediaUrl) => url.quality === mediaQuality) ||
+      data.mediaUrls[data.mediaUrls.length - 1]
+    : '';
 
   // Extract artist names and join them with a comma, ensuring uniqueness
-  // const artistNames = [
-  //   ...new Set(data.artists.map((artist: Artist) => artist.name)),
-  // ].join(', ');
+  const artistNames = [
+    ...new Set(data.artists.map((artist: Artist) => artist.name)),
+  ].join(', ');
 
   // Convert to MediaTrack format
   const track: Track = {
     id: data.id,
     artwork: [
       {
-        src: data?.images[2]?.link || data.images,
+        src: isValidArray(data.images) ? data?.images[2]?.link : data.images,
         name: data.title,
         sizes: '500x500',
       },
       {
-        src: data?.images[1]?.link || data.images,
+        src: isValidArray(data.images) ? data?.images[1]?.link : data.images,
         name: data.title,
         sizes: '150x150',
       },
       {
-        src: data?.images[0]?.link || data.images,
+        src: isValidArray(data.images) ? data?.images[0]?.link : data.images,
         name: data.title,
         sizes: '50x50',
       },
     ],
-    source: selectedMediaUrl.link,
+    source: selectedMediaUrl?.link || '',
     title: decodeHtmlEntities(data.title),
     album: decodeHtmlEntities(data.album),
-    artist: decodeHtmlEntities(data.music),
+    artist: data.music ? decodeHtmlEntities(data.music) : artistNames,
     comment: '',
     duration: parseInt(data.duration),
     genre: '', // Assuming genre is not provided in the given data
@@ -375,4 +384,43 @@ export function updateStatusBarColor(color: string) {
       }
     }
   }
+}
+
+export function capitalizeFirstLetter(str: string): string {
+  if (str.length === 0) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+const iconMap: { [key: string]: React.ComponentType<any> } = {
+  all: LuHeadphones,
+  songs: RiMusicFill,
+  albums: RiAlbumFill,
+  playlists: RiPlayListFill,
+  artists: RiMusic2Fill,
+};
+
+export const categoryCreator = (categories: string[]) => {
+  const updatedCategories = ['all', ...categories].filter((item) => item !== 'topquery');
+  const categoryObj = updatedCategories.map((category) => {
+    return {
+      id: category,
+      name: capitalizeFirstLetter(category),
+      icon: iconMap[category],
+    };
+  });
+  return categoryObj;
+};
+
+// Debounce function in TypeScript
+export function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number) {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+
+  const debounced = (...args: Parameters<F>) => {
+    if (timeout !== null) {
+      clearTimeout(timeout);
+    }
+    timeout = setTimeout(() => func(...args), waitFor);
+  };
+
+  return debounced as (...args: Parameters<F>) => ReturnType<F>;
 }

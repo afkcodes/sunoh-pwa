@@ -7,6 +7,7 @@ const Home = lazy(() => import('~pages/Home'));
 const Search = lazy(() => import('~pages/Search'));
 const Library = lazy(() => import('~pages/Library'));
 const AlbumScreen = lazy(() => import('~pages/Album'));
+const Radio = lazy(() => import('~pages/Radio'));
 
 const routes = [
   {
@@ -46,6 +47,14 @@ const routes = [
     element: (
       <Suspense fallback={<div>loading</div>}>
         <PlaylistScreen />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/radio',
+    element: (
+      <Suspense fallback={<div>loading</div>}>
+        <Radio />
       </Suspense>
     ),
   },

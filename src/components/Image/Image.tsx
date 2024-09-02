@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { proxyImageURL } from '~network/endpoints';
 import { ImageProps } from '../../types/component.types';
 import { fitStrategy, imgPosition } from './image.style';
 
@@ -30,14 +31,14 @@ const Image: React.FC<ImageProps> = ({
 
   return (
     <img
-      src={src}
+      src={`${proxyImageURL}${src}`}
       alt={altText}
       height={height}
       width={width}
       loading={loading}
       onLoad={onLoad}
       onError={onError}
-      className={` h-full w-full ${fitStrategy[fit]} ${imgPosition[position]}`}
+      className={` h-full w-full shrink-0 ${fitStrategy[fit]} ${imgPosition[position]}`}
     />
   );
 };

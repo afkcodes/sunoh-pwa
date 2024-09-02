@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MdLyrics, MdOutlineLyrics } from 'react-icons/md';
 import {
   RiEqualizer3Line,
@@ -24,7 +24,10 @@ import Figure from '~components/Figure/Figure';
 import QueueList from '~components/QueueList';
 import Slider from '~components/Slider/Slider';
 import TextLink from '~components/TextLink/TextLink';
-import { getColorWithOpacity, timeToReadable } from '~helper/common';
+import { getDominantColor } from '~helper/colorExtractor';
+import { getColorWithOpacity, rgbToHex, timeToReadable } from '~helper/common';
+import { detectOS, OperatingSystem } from '~helper/deviceDetector';
+import { mediaActions } from '~helper/mediaActions';
 import { audio, useAudio } from '~states/audioStore';
 
 const PlayerScreen = () => {
@@ -38,18 +41,16 @@ const PlayerScreen = () => {
   const [isEqVisible, setEqVisible] = useState(false);
 
   const [audioState] = useAudio();
+  const isPlaying = audioState.playbackState === 'playing';
 
   const togglePlayPause = () => {
-    if (audioState.playbackState === 'playing') {
-      audio.pause();
-    } else {
-      audio.play();
-    }
+    mediaActions.playOrPause(isPlaying, audioState);
   };
   const toggleFavorite = () => setIsFavorite(!isFavorite);
   const toggleRepeat = () => setRepeatMode((prevMode) => (prevMode + 1) % 3);
   const toggleShuffle = () => setIsShuffleOn(!isShuffleOn);
   const toggleLyrics = () => setShowLyrics(!showLyrics);
+  const [color, setColor] = useState('');
 
   const onNext = () => {
     audio.playNext();
@@ -58,7 +59,14 @@ const PlayerScreen = () => {
     audio.playPrevious();
   };
 
-  const color = audioState?.currentTrack?.palette?.[0].toString() || '#';
+  useEffect(() => {
+    getDominantColor(
+      audioState.currentTrack.artwork ? audioState.currentTrack.artwork[0].src : ''
+    ).then((res) => {
+      const arr = res?.split(',');
+      setColor(rgbToHex(Number(arr[0]), Number(arr[1]), Number(arr[2])));
+    });
+  }, [audioState.currentTrack]);
 
   return (
     <div
@@ -94,7 +102,7 @@ const PlayerScreen = () => {
           } transition-all duration-400 ease-in-out flex flex-col items-center`}>
           <div
             className={`my-4 transition-transform duration-300 ease-in-out transform shadow-2xl ${
-              audioState.playbackState === 'playing' ? 'scale-1' : ' scale-[80%]'
+              isPlaying ? 'scale-1' : ' scale-[80%]'
             }`}>
             <Figure
               src={[
@@ -196,14 +204,10 @@ const PlayerScreen = () => {
         <Button
           variant='unstyled'
           onClick={togglePlayPause}
-          classNames={`p-0 m-0 h-full bg-surface  w-full text-text-primary p-3 m-0 transition-all duration-100 active:scale-90 backdrop-blur-sm
-             ${audioState.playbackState === 'playing' ? 'rounded-xl' : 'rounded-full'}
+          classNames={`p-0 m-0 h-full bg-surface text-text-primary p-3 m-0 transition-all duration-100 active:scale-90 backdrop-blur-sm
+             ${isPlaying ? 'rounded-xl' : 'rounded-full'}
             `}>
-          {audioState.playbackState === 'playing' ? (
-            <RiPauseMiniFill size={56} />
-          ) : (
-            <RiPlayMiniFill size={56} />
-          )}
+          {isPlaying ? <RiPauseMiniFill size={56} /> : <RiPlayMiniFill size={56} />}
         </Button>
 
         <Button
@@ -232,14 +236,16 @@ const PlayerScreen = () => {
             {showLyrics ? <MdLyrics size={24} /> : <MdOutlineLyrics size={24} />}
           </Button>
 
-          <Button
-            onClick={() => {
-              setEqVisible(true);
-            }}
-            variant='unstyled'
-            classNames='p-0 ml-6 transition-all text-text-secondary active:text-text-primary active:scale-90'>
-            <RiEqualizer3Line size={24} />
-          </Button>
+          {detectOS() === OperatingSystem.Android && (
+            <Button
+              onClick={() => {
+                setEqVisible(true);
+              }}
+              variant='unstyled'
+              classNames='p-0 ml-6 transition-all text-text-secondary active:text-text-primary active:scale-90'>
+              <RiEqualizer3Line size={24} />
+            </Button>
+          )}
         </div>
 
         <div className='flex'>

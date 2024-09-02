@@ -1,14 +1,7 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Fragment, useEffect, useRef, useState } from 'react';
-import {
-  LuChevronLeft,
-  LuHeart,
-  LuMoreVertical,
-  LuPause,
-  LuPlay,
-  LuShuffle,
-} from 'react-icons/lu';
-import { RiShareForwardLine } from 'react-icons/ri';
+import { LuChevronLeft, LuHeart, LuMoreVertical, LuShuffle } from 'react-icons/lu';
+import { RiPauseMiniFill, RiPlayMiniFill, RiShareForwardLine } from 'react-icons/ri';
 import { useParams } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import Button from '~components/Button/Button';
@@ -184,22 +177,16 @@ const PlaylistScreen = () => {
                     renderItem={(audioState) => (
                       <Button
                         variant='primary'
-                        classNames='transition-all duration-300 active:scale-90'
+                        classNames='transition-all duration-300  p-2 active:scale-90'
                         radius='full'
                         size='md'
-                        onClick={onPlayAll}
-                        prefixIcon={
-                          audioState.playbackState === 'playing' &&
-                          audioState.currentPlaybackSource === data.id ? (
-                            <LuPause size={22} fill='white' />
-                          ) : (
-                            <LuPlay fill='white' size={22} />
-                          )
-                        }>
+                        onClick={onPlayAll}>
                         {audioState.playbackState === 'playing' &&
-                        audioState.currentPlaybackSource === data.id
-                          ? 'PAUSE'
-                          : 'PLAY'}
+                        audioState.currentPlaybackSource === data.id ? (
+                          <RiPauseMiniFill size={38} fill='white' stroke='2' />
+                        ) : (
+                          <RiPlayMiniFill fill='white' size={38} />
+                        )}
                       </Button>
                     )}
                   />

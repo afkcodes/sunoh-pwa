@@ -1,5 +1,6 @@
 const dataConfigs = {
   album: {
+    id: 'id',
     title: 'title',
     artists: 'artists',
     images: 'images.2.link',
@@ -12,10 +13,15 @@ const dataConfigs = {
     id: 'id',
     title: 'title',
     subtitle: 'subtitle',
-    image: 'images.1.link',
+    images: 'images.1.link',
     duration: 'duration',
     artist: 'artist',
     palette: 'palette',
+  },
+  radio: {
+    id: 'id',
+    language: 'language',
+    name: 'name',
   },
 };
 

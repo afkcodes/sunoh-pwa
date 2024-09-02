@@ -2,6 +2,7 @@ import { Fragment } from 'react';
 import { componentConfig } from '~configs/component.config';
 import { dataConfigs } from '~configs/data.config';
 import SectionContainer from '~containers/SectionContainer';
+import { mediaActions } from '~helper/mediaActions';
 import useFetch from '~hooks/useFetch';
 import useHistory from '~hooks/useHistory';
 import useScrollToTop from '~hooks/useScrollToTop';
@@ -17,7 +18,7 @@ const Home = () => {
 
   const { push } = useHistory();
 
-  const onClick = (category: string, token: string) => {
+  const onClick = (category: string, token: string, item: any) => {
     if (category === 'album') {
       push(`/album/${token}`);
     }
@@ -27,6 +28,13 @@ const Home = () => {
     if (category === 'mix') {
       push(`/playlist/${token}?type=mix`);
     }
+    if (category === 'radio_station') {
+      mediaActions.createSaavnRadioAndPlay(item, '160kbps');
+    }
+  };
+
+  const onActionHeaderClick = () => {
+    push(`/radio`);
   };
 
   return (
@@ -47,7 +55,7 @@ const Home = () => {
               textLinkConfig: componentConfig.headerConfig,
               actionButtonConfig: {
                 ...componentConfig.headerActionButtonConfig,
-                onClick: () => {},
+                onClick: onActionHeaderClick,
                 children: 'More',
               },
             }}

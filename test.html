@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HLS Audio Player with CloudFront Cookies</title>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+    }
+
+    .player-container {
+      text-align: center;
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="player-container">
+    <h1>HLS Audio Player</h1>
+    <audio id="audio" controls></audio>
+    <br>
+    <button onclick="togglePlay()">Play/Pause</button>
+  </div>
+
+  <script>
+    const audioElement = document.getElementById('audio');
+    const streamUrl = "https://cm5.wynk.in/srch_universalmusic/59046d9e-336d-3aa7-b201-c822322c37c7/7253187ae00fe752fa8a05fbb6242b97/hls/music/,128,64,32,320,/32/index.m3u8?Key-Pair-Id=APKAJREYRYFCU2OXNSTA&Policy=eyJTdGF0ZW1lbnQiOiBbeyJSZXNvdXJjZSI6Imh0dHBzOi8vY201Lnd5bmsuaW4vc3JjaF91bml2ZXJzYWxtdXNpYy81OTA0NmQ5ZS0zMzZkLTNhYTctYjIwMS1jODIyMzIyYzM3YzcvNzI1MzE4N2FlMDBmZTc1MmZhOGEwNWZiYjYyNDJiOTcvaGxzL211c2ljLyoiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE3MjM4MjU0NTJ9fX1dfQ__&Signature=O5pRVzvhRUszBzNQ6oMTuMqTguxqY1B6Icrlf7PgGky5pXUxBY3jrNgGqJTQDjzC%7Ev%7EzoLfq6Vgso1lCsmXQ96Kvd6MJQA6p875WjQUkQc5IG%7EERCRLXJfGe24Ufs7xLUez6joMJ%7ECNKASGx36rOI4d0esx2dHBZ7inLCE2kZr2jzPabpeqpCODkCmkA-FcqQ92ZsfoIHXxSs6xH6kMhCwMCMzAduNzuoLL4S29XAzC7SQm8bJ7B5Rl5xU2vwJzyTSNi9udeGokCxvsWI0NYmdno9oZ0YWQPmBc3xx5rV-SVNK9On%7EXcNt8nUrltagJNNpG%7EBjzlQJlLWfMe7tbDOg__"
+
+    const cloudFrontCookies = {
+      "CloudFront-Policy": "eyJTdGF0ZW1lbnQiOiBbeyJSZXNvdXJjZSI6Imh0dHBzOi8vY201Lnd5bmsuaW4vc3JjaF91bml2ZXJzYWxtdXNpYy8xZTRiOWJhYi03YzVkLTNmMTQtOGE3OC1jNGQ1Y2ZlNzk1OWYvMjllMDEwZDI2ODk0OGFjOGRjMjllNzlkMTQ5YjI5YjIvaGxzL211c2ljLyoiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE3MjM4MjQ5MTJ9fX1dfQ__",
+      "CloudFront-Signature": "noXAJRNIhumCjzmBONlWx58aSVNeSXybFpNYOSt4IDAyQlkbtnTwmGSR8ZdzzAMaIauZQKoeBVS9xf6j9Svq5t4QoI8LPR-ctkDGemTWb2Sw8OKI612-1GZQAKIXrM6HfpEvqZtaTXyvenc8~LdG-Ai29F29OyTNk90sTvHX0Y3luNPYTIsJwQWQMyiOMTKM2PvhXMHobRAlmdFCfBKvr534FU2YjNmsqfIuY3m7qF3PbSJMnYLQv1541muGFXTqwpSjlAYMLM5EnU3-YeAYU8gJd7zxYYuIfH4wcXdNZbkbgSNti0rt45tCq1x5~dsijpCPqmqvSbYWpABNOXVkIw__",
+      "CloudFront-Key-Pair-Id": "APKAJREYRYFCU2OXNSTA"
+    };
+
+    function setCookies() {
+      Object.keys(cloudFrontCookies).forEach(key => {
+        document.cookie = `${key}=${cloudFrontCookies[key]}; path=/; secure; samesite=strict`;
+      });
+    }
+
+    function initPlayer() {
+      setCookies();  // Set CloudFront cookies before initializing the player
+
+      if (Hls.isSupported()) {
+        const hls = new Hls({
+          xhrSetup: function (xhr, url) {
+            // Set CloudFront cookies in the request headers
+            Object.keys(cloudFrontCookies).forEach(key => {
+              xhr.setRequestHeader(key, cloudFrontCookies[key]);
+            });
+          }
+        });
+
+        hls.loadSource(streamUrl);
+        hls.attachMedia(audioElement);
+
+        hls.on(Hls.Events.MANIFEST_PARSED, function () {
+          console.log('Manifest parsed, ready to play');
+        });
+
+        hls.on(Hls.Events.ERROR, function (event, data) {
+          if (data.fatal) {
+            switch (data.type) {
+              case Hls.ErrorTypes.NETWORK_ERROR:
+                console.error('Fatal network error encountered, trying to recover');
+                hls.startLoad();
+                break;
+              case Hls.ErrorTypes.MEDIA_ERROR:
+                console.error('Fatal media error encountered, trying to recover');
+                hls.recoverMediaError();
+                break;
+              default:
+                console.error('Fatal error, cannot recover:', data);
+                hls.destroy();
+                break;
+            }
+          }
+        });
+      } else if (audioElement.canPlayType('application/vnd.apple.mpegurl')) {
+        audioElement.src = streamUrl;
+        // Note: Cookie setting might not work with native HLS playback
+        console.warn('Using native HLS playback. CloudFront cookies may not be applied.');
+      } else {
+        console.error('This browser does not support HLS playback');
+      }
+    }
+
+    function togglePlay() {
+      if (audioElement.paused) {
+        audioElement.play().catch(error => {
+          console.error('Error attempting to play:', error);
+        });
+      } else {
+        audioElement.pause();
+      }
+    }
+
+    initPlayer();
+  </script>
+</body>
+
+</html>

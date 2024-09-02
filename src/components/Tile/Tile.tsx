@@ -1,3 +1,4 @@
+import { LuMoreVertical } from 'react-icons/lu';
 import Button from '~components/Button/Button';
 import Figure from '~components/Figure/Figure';
 import TextLink from '~components/TextLink/TextLink';
@@ -10,8 +11,10 @@ const Tile: React.FC<TileProps> = ({
   figureConfig,
   titleConfig,
   subTitleConfig,
+  variant = 'tile',
   onClick,
 }) => {
+  const id = dataExtractor(data, config.id) || '';
   const title = dataExtractor(data, config.title);
   const subtitle =
     getNonEmptyStringData(dataExtractor(data, config?.subtitle)) ||
@@ -25,13 +28,26 @@ const Tile: React.FC<TileProps> = ({
   return (
     <Button
       variant='unstyled'
-      classNames='z-0 flex flex-col items-start transition-all duration-300 active:scale-90 p-0 m-0'
+      classNames={`
+        relative flex w-full text-start transition-all duration-300  p-0 m-0 flex
+        ${variant === 'list' ? 'px-2 ' : 'flex-col active:scale-95'}
+        `}
       onClick={onClick}>
-      <Figure {...figureConfig} src={[images]} alt={alt} />
-      <div className='py-0.5 flex flex-col w-full'>
+      <Figure {...figureConfig} src={[images]} alt={alt} id={id} />
+      <div className='py-0.5 flex flex-col w-full item-stretch ml-2'>
         {title?.length ? <TextLink {...titleConfig}>{title}</TextLink> : null}
         {subtitle?.length ? <TextLink {...subTitleConfig}>{subtitle}</TextLink> : null}
       </div>
+      {variant === 'list' ? (
+        <div>
+          <Button
+            classNames='text-gray-400 transition-colors active:text-white active:scale-90 p-0 m-0'
+            variant='unstyled'
+            onClick={() => {}}>
+            <LuMoreVertical size={20} />
+          </Button>
+        </div>
+      ) : null}
     </Button>
   );
 };

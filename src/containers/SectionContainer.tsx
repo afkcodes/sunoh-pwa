@@ -10,7 +10,7 @@ interface SectionContainerProps {
   containerConfig: {
     tileContainerConfig: Omit<TileContainerProps, 'data' | 'config'>;
   };
-  onItemClick: (_param?: any, _param2?: any) => void;
+  onItemClick: (_param?: any, _param2?: any, _param3?: any) => void;
   headerConfig: SectionHeaderProps;
 }
 

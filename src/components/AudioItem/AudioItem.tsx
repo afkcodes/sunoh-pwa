@@ -22,7 +22,7 @@ const AudioItem: React.FC<AudioItemProps> = ({
   const subtitle =
     (dataExtractor(data, config.subtitle) as string) ||
     dataExtractor(data, config.artist);
-  const image = dataExtractor(data, config.image) as string;
+  const image = dataExtractor(data, config.images) as string;
   const duration = Number(dataExtractor(data, config.duration) || 0);
   // const palette = dataExtractor(data, dataConfigs.audio.palette);
 

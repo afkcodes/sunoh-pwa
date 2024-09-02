@@ -9,7 +9,6 @@ import {
   RiVolumeMuteLine,
   RiVolumeUpLine,
 } from 'react-icons/ri';
-import { presets } from '~constants/presets';
 import { storage } from '~helper/storage';
 import { audio } from '~states/audioStore';
 import Button from './Button/Button';
@@ -17,7 +16,7 @@ import Slider from './Slider/Slider';
 import TextLink from './TextLink/TextLink';
 
 const Equalizer = () => {
-  const defaultPresets = presets;
+  const defaultPresets = audio.getPresets();
   const [activePreset, setActivePreset] = useState<Preset>(defaultPresets[0]);
   const [levels, setLevels] = useState(Array(10).fill(0));
   const [virtualSurround, setVirtualSurround] = useState(false);
@@ -97,9 +96,9 @@ const Equalizer = () => {
             <RangeSlider.Root
               orientation='vertical'
               className='relative flex items-center justify-center flex-1 w-0.5 select-none h-60 touch-none'
-              min={-12}
-              max={12}
-              step={0.1}
+              min={-10}
+              max={10}
+              step={0.2}
               value={[levels[index]]}
               onValueChange={(newValue) => handleSliderChange(index, newValue)}>
               <RangeSlider.Track className='relative rounded-full bg-white/60 h-60 backdrop-blur grow'>

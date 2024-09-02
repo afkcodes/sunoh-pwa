@@ -41,11 +41,11 @@ const Observer: React.FC<ObserverProps> = ({
   }, [ref, observerCallback, observerOption]);
 
   return (
-    <div ref={ref} className='w-full h-full'>
+    <div ref={ref} className='w-full h-full shrink-0'>
       {isIntersecting ? (
         children
       ) : (
-        <div className='w-full h-full animate-pulse bg-surface ' />
+        <div className='w-full h-full animate-pulse bg-surface shrink-0 grow aspect-square ' />
       )}
     </div>
   );

@@ -15,6 +15,7 @@ const Button: React.FC<ButtonProps> = ({
   suffixIcon,
   loading,
   classNames,
+  id,
 }) => {
   // Merge the classes using twMerge to handle any conflicts
   const className = merge(buttonStyles({ variant, size, disabled, radius }), classNames);
@@ -28,7 +29,11 @@ const Button: React.FC<ButtonProps> = ({
   };
 
   return (
-    <button className={className} onClick={onButtonClick} disabled={disabled || false}>
+    <button
+      id={id}
+      className={className}
+      onClick={onButtonClick}
+      disabled={disabled || false}>
       {loading ? (
         <RiLoader5Fill className='p-0 m-0 animate-spin' size={20} />
       ) : (

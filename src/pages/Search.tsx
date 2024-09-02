@@ -1,64 +1,203 @@
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { RiSearch2Line } from 'react-icons/ri';
+import Button from '~components/Button/Button';
 import Input from '~components/Input/Input';
-import Tile from '~components/Tile/Tile';
-import useViewTransition from '~hooks/useViewTransition';
+import Section from '~components/Section/Section';
+import { componentConfig } from '~configs/component.config';
+import { dataConfigs } from '~configs/data.config';
+import SectionContainer from '~containers/SectionContainer';
+import { categoryCreator, debounce, isValidArray } from '~helper/common';
+import useFetch from '~hooks/useFetch';
+import useScrollToTop from '~hooks/useScrollToTop';
+import { endpoints } from '~network/endpoints';
+import http from '~network/http';
 
-const Search = () => {
-  const navigate = useViewTransition();
+interface Category {
+  id: string;
+  name: string;
+  icon: React.ComponentType<any>;
+}
+
+const SearchScreen: React.FC = () => {
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [categories, setCategories] = useState<Category[] | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string>('all');
+  const pillsRef = useRef<HTMLDivElement>(null);
+
+  const { data, refetch, isSuccess, isError } = useFetch({
+    queryKey: [`search_${searchTerm}_${activeCategory}`],
+    queryFn: async () =>
+      await http(`${endpoints.saavn.search}?q=${searchTerm}&type=${activeCategory}`),
+    shouldFetchOnLoad: false,
+  });
+
+  const handleClearSearch = () => {
+    setSearchTerm('');
+  };
+
+  const handleCategoryChange = (category: string) => {
+    const pillElement = document.getElementById(`pill-${category}`);
+    if (pillElement) {
+      pillElement.scrollIntoView({
+        behavior: 'smooth',
+        inline: 'center',
+        block: 'nearest',
+      });
+    }
+    setActiveCategory(category);
+  };
+
+  const debouncedRefetch = useCallback(
+    debounce(() => {
+      if (searchTerm.trim()) {
+        refetch();
+      }
+    }, 300),
+    [searchTerm, activeCategory, refetch]
+  );
+
+  const onChange = (val: string) => {
+    setSearchTerm(val);
+    debouncedRefetch();
+  };
+
+  useEffect(() => {
+    if (searchTerm.trim()) {
+      debouncedRefetch();
+    }
+  }, [activeCategory, debouncedRefetch]);
+
+  useEffect(() => {
+    if (isSuccess && isValidArray(data)) {
+      setCategories(categoryCreator(data.map((d: any) => d.heading.toLowerCase())));
+      // console.log();
+    }
+  }, [data, isSuccess]);
+
+  useScrollToTop();
 
   return (
-    <div className='w-full px-2 py-2'>
-      <Input
-        placeholder='Hello Input'
-        suffixIcon={<RiSearch2Line size={26} className='text-text-secondary' />}
-      />
-
-      <div className='grid w-full grid-cols-2 gap-8 pt-2'>
-        {[1, 2, 3, 4, 8, 5, 6].map((item, idx) => (
-          <div className={`${idx % 2 !== 0 ? 'justify-self-end' : ''}`}>
-            <Tile
-              onClick={() => {
-                navigate('/library');
-              }}
-              key={item}
-              figureConfig={{
-                fit: 'cover',
-                radius: 'xxxs',
-                size: 'full',
-                position: 'top',
-              }}
-              titleConfig={{
-                color: 'primary',
-                size: 'md',
-                weight: 'medium',
-              }}
-              subTitleConfig={{
-                color: 'light',
-                size: 'xs',
-              }}
-              data={{
-                image: [
-                  'https://dx35vtwkllhj9.cloudfront.net/universalstudios/despicable-me-4/images/gallery/image6.jpg',
-                ],
-                title: 'Big Hero 6',
-                subtitle: 'Baymax',
-              }}
-              config={{
-                images: 'image.0',
-                title: 'title',
-                subtitle: 'subtitle',
-              }}
+    <div className='min-h-screen text-gray-100 bg-background'>
+      <div className='w-full'>
+        <div className='sticky top-0 z-20 flex flex-col pt-3 space-y-3 bg-background'>
+          <div className='h-12 px-2 '>
+            <Input
+              placeholder='Search...'
+              suffixIcon={<RiSearch2Line size={26} className='text-text-secondary' />}
+              onChange={onChange}
+              value={searchTerm}
             />
           </div>
-        ))}
+          <div className='sticky top-0 mb-6 overflow-x-auto no-scrollbar' ref={pillsRef}>
+            <ul className='flex pb-2 pr-8 space-x-2 first:ml-2'>
+              {categories
+                ? categories.map((category, index) => (
+                    <li
+                      key={category.id}
+                      className={index === categories.length - 1 ? 'pr-2' : ''}>
+                      <Button
+                        size='sm'
+                        radius='full'
+                        variant={activeCategory === category.id ? 'primary' : 'dark'}
+                        id={`pill-${category.id}`}
+                        classNames={`flex items-center`}
+                        onClick={() => handleCategoryChange(category.id)}
+                        prefixIcon={<category.icon size={16} />}>
+                        <span>{category.name}</span>
+                      </Button>
+                    </li>
+                  ))
+                : null}
+            </ul>
+          </div>
+        </div>
+        <div>
+          {!isSuccess && searchTerm && <p>Loading...</p>}
+          {isSuccess && data && (
+            <div className='flex flex-col mt-8'>
+              {activeCategory === 'all' ? (
+                <SectionContainer
+                  data={data}
+                  config={
+                    data.heading === 'Songs' ? dataConfigs.audio : dataConfigs.album
+                  }
+                  headerConfig={{
+                    textLinkConfig: componentConfig.headerConfig,
+                    actionButtonConfig: {
+                      ...componentConfig.headerActionButtonConfig,
+                      onClick: () => {},
+                      children: 'More',
+                    },
+                  }}
+                  containerConfig={{
+                    tileContainerConfig: {
+                      tileConfig: {
+                        variant: 'list',
+                        figureConfig: {
+                          fit: 'cover',
+                          radius: 'xs',
+                          size: 'xs',
+                        },
+                        subTitleConfig: {
+                          size: 'xs',
+                          weight: 'normal',
+                        },
+                        titleConfig: {
+                          size: 'sm',
+                          weight: 'medium',
+                        },
+                      },
+                      onTileClick: () => {},
+                      layout: 'list',
+                    },
+                  }}
+                  onItemClick={function (
+                    _param?: any,
+                    _param2?: any,
+                    _param3?: any
+                  ): void {
+                    throw new Error('Function not implemented.');
+                  }}
+                />
+              ) : (
+                <Section
+                  data={data}
+                  config={
+                    data.heading === 'Songs' ? dataConfigs.audio : dataConfigs.album
+                  }
+                  containerConfig={{
+                    tileContainerConfig: {
+                      tileConfig: {
+                        variant: 'list',
+                        figureConfig: {
+                          fit: 'cover',
+                          radius: 'xs',
+                          size: 'xs',
+                        },
+                        subTitleConfig: {
+                          size: 'xs',
+                          weight: 'normal',
+                        },
+                        titleConfig: {
+                          size: 'sm',
+                          weight: 'medium',
+                        },
+                      },
+                      onTileClick: () => {},
+                      layout: 'list',
+                    },
+                    audioItemConfig: {
+                      type: 'thumbnail',
+                    },
+                  }}
+                />
+              )}
+            </div>
+          )}
+        </div>
       </div>
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Temporibus cum doloribus
-        autem, exercitationem omnis quo ipsa ipsam ratione consectetur est aliquam
-        doloremque accusantium vitae minima et tempore illo velit ex.
-      </p>
     </div>
   );
 };
 
-export default Search;
+export default SearchScreen;

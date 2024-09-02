@@ -15,8 +15,12 @@ const Figure: React.FC<FigureProps> = ({
   dominantColor = '',
   mode = 'single',
   position = 'center',
+  id,
 }) => {
-  const className = merge(figureStyles({ radius, size }), 'aspect-square');
+  const className = merge(
+    figureStyles({ radius, size }),
+    'relative aspect-square shrink-0'
+  );
   const [loadStatus, setLoadStatus] = useState<SetStateAction<ImageStatus>>('LOADING');
   const sourceImages: string | string[] = mode === 'multi' ? src : src[0];
 
@@ -75,7 +79,7 @@ const Figure: React.FC<FigureProps> = ({
       <div
         className={
           loadStatus === 'LOADING'
-            ? 'animate-pulse bg-surface absolute h-full w-full top-0'
+            ? 'animate-pulse bg-surface grow shrink-0 absolute h-full w-full top-0'
             : 'hidden'
         }
       />

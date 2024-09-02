@@ -123,7 +123,7 @@ class ChangeNotifier<T> {
       cb(stateData, this.getActionSet(), prevState, transient)
     );
 
-    console.log(`Notify called for '${eventName}' by '${caller}', data:`, data);
+    // console.log(`Notify called for '${eventName}' by '${caller}', data:`, data);
   }
 
   /**
@@ -174,7 +174,7 @@ class ChangeNotifier<T> {
     }
     const sliceListeners = this.listeners[eventName][sliceName];
     if (!sliceListeners || !sliceListeners.delete(callback)) {
-      console.warn(`Cannot unsubscribe to a non-existent listener '${eventName}'.`);
+      // console.warn(`Cannot unsubscribe to a non-existent listener '${eventName}'.`);
     }
   }
 

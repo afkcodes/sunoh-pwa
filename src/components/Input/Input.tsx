@@ -11,6 +11,7 @@ interface InputProps {
   prefixIcon?: React.ReactNode;
   suffixIcon?: React.ReactNode;
   onIconClick?: () => void;
+  value?: string;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -24,6 +25,7 @@ const Input: React.FC<InputProps> = ({
   prefixIcon,
   suffixIcon,
   onIconClick,
+  value,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -44,10 +46,7 @@ const Input: React.FC<InputProps> = ({
     }
   };
 
-  const handleFocus: FocusEventHandler<HTMLInputElement> = (
-    event: FocusEvent<HTMLInputElement>
-  ) => {
-    console.log(event.target.value);
+  const handleFocus: FocusEventHandler<HTMLInputElement> = () => {
     if (onFocus) {
       onFocus();
     }
@@ -66,7 +65,7 @@ const Input: React.FC<InputProps> = ({
   };
 
   return (
-    <div className='flex items-center justify-center w-full py-3 pl-2 pr-3 overflow-hidden rounded-xs bg-surface'>
+    <div className='flex items-center justify-center w-full h-full py-1 pl-2 pr-3 overflow-hidden rounded-xs bg-surface'>
       {suffixIcon && <span className='ml-2'>{prefixIcon}</span>}
       <input
         className='w-full h-full outline-none text-text-secondary bg-surface'
@@ -76,6 +75,7 @@ const Input: React.FC<InputProps> = ({
         onBlur={handleBlur}
         onKeyDown={onSubMitKeyDown}
         onFocus={handleFocus}
+        value={value}
       />
       {suffixIcon && (
         <Button classNames='ml-2 p-0' variant='unstyled' onClick={onIconButtonClick}>

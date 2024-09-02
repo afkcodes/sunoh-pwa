@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   RiHeartFill,
   RiHeartLine,
@@ -13,8 +13,10 @@ import Button from '~components/Button/Button';
 import Figure from '~components/Figure/Figure';
 import PlayerScreen from '~components/Player/Player';
 import TextLink from '~components/TextLink/TextLink';
-import { getColorWithOpacity } from '~helper/common';
-import { audio, useAudio } from '~states/audioStore';
+import { getDominantColor } from '~helper/colorExtractor';
+import { getColorWithOpacity, rgbToHex } from '~helper/common';
+import { mediaActions } from '~helper/mediaActions';
+import { useAudio } from '~states/audioStore';
 
 const MiniPlayer = () => {
   const [audioState] = useAudio();
@@ -23,17 +25,26 @@ const MiniPlayer = () => {
   const [isJamming, setIsJamming] = useState(false);
   const [isPlayerExpanded, setPlayerExpanded] = useState(false);
   const isPlaying = audioState.playbackState === 'playing';
+  const [color, setColor] = useState('');
 
   const onPlayOrPause = () => {
-    isPlaying ? audio.pause() : audio.play();
+    mediaActions.playOrPause(isPlaying, audioState);
   };
 
-  const color = audioState?.currentTrack?.palette?.[0] || '#';
+  useEffect(() => {
+    getDominantColor(
+      audioState.currentTrack.artwork ? audioState.currentTrack.artwork[0].src : ''
+    ).then((res) => {
+      const arr = res?.split(',');
+      setColor(rgbToHex(Number(arr[0]), Number(arr[1]), Number(arr[2])));
+    });
+  }, [audioState.currentTrack]);
 
   return audioState.currentTrack.source ? (
     <motion.div
       style={{
-        backgroundColor: getColorWithOpacity(color, 0.4),
+        backgroundColor: getColorWithOpacity(color, 0.3),
+        backdropFilter: 'blur(8px)',
       }}
       initial={{ y: 100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
