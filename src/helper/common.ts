@@ -236,3 +236,6 @@ export const isColorDark = (color: string) => {
 
 //   return mediaTrack;
 // };
+
+export const getUniqueId = () =>
+  Date.now().toString(36) + Math.random().toString(36).substr(2);

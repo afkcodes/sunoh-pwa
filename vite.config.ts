@@ -24,7 +24,7 @@ export default defineConfig({
         name: 'sunoh',
         short_name: 'sunoh',
         description: 'music app',
-        theme_color: '#171717',
+        theme_color: '#0a0a0a',
       },
 
       injectManifest: {

@@ -18,9 +18,11 @@ import {
   RiVolumeMuteLine,
   RiVolumeUpLine,
 } from 'react-icons/ri';
+import BottomSheet from '~components/BottomSheet/BottomSheet';
 import Button from '~components/Button/Button';
 import Figure from '~components/Figure/Figure';
 import Marquee from '~components/Marquee/Marquee';
+import QueueList from '~components/QueueList';
 import Slider from '~components/Slider/Slider';
 import TextLink from '~components/TextLink/TextLink';
 
@@ -36,6 +38,7 @@ const PlayerScreen = () => {
   const [duration, setDuration] = useState(225); // Example duration: 3:45
   const [trackData, setTrackData] = useState<any>(null);
   const [isJamming, setIsJamming] = useState(false);
+  const [isQueueVisible, setIsQueueVisible] = useState(false);
 
   useEffect(() => {
     // Simulating fetching track data from a backend
@@ -52,16 +55,7 @@ const PlayerScreen = () => {
         Aisi Barasaato Men, Kaisaa Lagataa Hai?
         Lataa: [Aisaa Lagataa Hai Tum Banake Baadal,
         Mere Badan Ko Bhigoke Mujhe, Chhed Rahe Ho O
-        Chhed Rahe Ho ] - 2
-
-        [Ambar Khele Holi Ui Maan
-        Bhigi Mori Choli, Hamajoli, Hamajoli ] - 2
-        O, Paani Ke Is Rele Men Saavan Ke Is Mele Men
-        Chhat Pe Akele Men
-        Kaisaa Lagataa Hai
-        Aisaa Lagataa Hai
-        Tu Banake Ghataa Apane Sajan Ko Bhigoke Khel Khel Rahi Ho O
-        Khel Rahi Ho`,
+        Chhed Rahe Ho ] - 2`,
       };
       setTrackData(mockData as any);
       setDuration(122);
@@ -283,13 +277,28 @@ const PlayerScreen = () => {
             <RiRfidLine size={24} />
           </Button>
           <Button
-            onClick={() => {}}
+            onClick={() => {
+              setIsQueueVisible(true);
+            }}
             variant='unstyled'
             classNames='transition-colors text-text-secondary active:text-text-primary active:scale-95 p-0 m-0'>
             <RiPlayList2Fill size={22} />
           </Button>
         </div>
       </div>
+      <BottomSheet
+        isOpen={isQueueVisible}
+        dismissible={false}
+        name='queue_screen'
+        onClose={() => {
+          setIsQueueVisible(false);
+        }}>
+        <QueueList
+          onClose={() => {
+            setIsQueueVisible(false);
+          }}
+        />
+      </BottomSheet>
     </div>
   );
 };

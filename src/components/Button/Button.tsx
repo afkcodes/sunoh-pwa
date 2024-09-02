@@ -19,8 +19,16 @@ const Button: React.FC<ButtonProps> = ({
   // Merge the classes using twMerge to handle any conflicts
   const className = merge(buttonStyles({ variant, size, disabled, radius }), classNames);
 
+  const onButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onClick) {
+      onClick();
+    }
+  };
+
   return (
-    <button className={className} onClick={onClick} disabled={disabled || false}>
+    <button className={className} onClick={onButtonClick} disabled={disabled || false}>
       {loading ? (
         <RiLoader5Fill className='p-0 m-0 animate-spin' size={20} />
       ) : (
