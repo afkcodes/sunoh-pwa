@@ -1,15 +1,13 @@
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'wouter';
 import Button from '~components/Button/Button';
 import TextLink from '~components/TextLink/TextLink';
 import { NavItems, navItems } from '~constants/navigation';
-import useViewTransition from '~hooks/useViewTransition';
 
 const BottomNavContainer = () => {
-  const location = useLocation();
-  const startViewTransition = useViewTransition();
+  const [location, navigate] = useLocation();
 
   const onClick = (path: string) => {
-    startViewTransition(path);
+    navigate(path);
   };
 
   return (
@@ -28,15 +26,13 @@ const BottomNavContainer = () => {
               <item.icon
                 size={28}
                 className={`${
-                  location.pathname === item.path
-                    ? 'text-primary-light'
-                    : 'text-text-primary'
+                  location === item.path ? 'text-primary-light' : 'text-text-primary'
                 }`}
               />
               <TextLink
                 size='xs'
                 classNames='text-xxs'
-                color={location.pathname === item.path ? 'accent' : 'primary'}>
+                color={location === item.path ? 'accent' : 'primary'}>
                 {item.title}
               </TextLink>
             </div>

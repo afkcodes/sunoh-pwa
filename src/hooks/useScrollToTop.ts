@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { usePathname } from 'wouter/use-browser-location';
 
 const useScrollToTop = () => {
   // Extracts pathname property(key) from an object
-  const { pathname } = useLocation();
+  const pathname = usePathname();
 
   // Automatically scrolls to top whenever pathname changes
   useEffect(() => {

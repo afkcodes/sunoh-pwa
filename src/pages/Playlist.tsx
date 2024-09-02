@@ -2,8 +2,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { LuChevronLeft, LuHeart, LuMoreVertical, LuShuffle } from 'react-icons/lu';
 import { RiPauseMiniFill, RiPlayMiniFill, RiShareForwardLine } from 'react-icons/ri';
-import { useParams } from 'react-router';
-import { useSearchParams } from 'react-router-dom';
+import { useParams } from 'wouter';
 import Button from '~components/Button/Button';
 import Figure from '~components/Figure/Figure';
 import TextLink from '~components/TextLink/TextLink';
@@ -40,15 +39,16 @@ const PlaylistScreen = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  let [searchParams] = useSearchParams();
-  const type = searchParams.get('type');
+  const params = new URL(window.location.href).searchParams;
+  const category = params.get('category');
+
   const url =
-    type === 'mix'
+    category === 'mix'
       ? `${endpoints.saavn.mix}/${playlistId}`
       : `${endpoints.saavn.playlist}/${playlistId}`;
 
   const { data, isLoading } = useFetch({
-    queryKey: [`album_${playlistId}`],
+    queryKey: [`playlist_${playlistId}`],
     queryFn: async () => await http(url),
   });
 

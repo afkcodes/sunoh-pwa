@@ -13,23 +13,28 @@ export interface AudioStoreState extends AudioState {
 }
 
 const audio = new AudioX();
-audio.init({
-  mode: 'REACT',
-  crossOrigin: 'anonymous',
-  preloadStrategy: 'auto',
-  playbackRate: 1,
-  autoPlay: false,
-  useDefaultEventListeners: true,
-  showNotificationActions: true,
-  enablePlayLog: true,
-  enableEQ: detectOS() === OperatingSystem.Android ? true : false,
-  enableHls: true,
-  hlsConfig: {
-    maxMaxBufferLength: 10,
-    startLevel: -1,
-    // autoStartLoad: false,
-  },
-});
+audio
+  .init({
+    mode: 'REACT',
+    crossOrigin: 'anonymous',
+    preloadStrategy: 'auto',
+    playbackRate: 1,
+    autoPlay: false,
+    useDefaultEventListeners: true,
+    showNotificationActions: true,
+    enablePlayLog: true,
+    enableEQ: detectOS() === OperatingSystem.Android ? true : false,
+    enableHls: true,
+    hlsConfig: {
+      maxMaxBufferLength: 10,
+      startLevel: -1,
+      // autoStartLoad: false,
+    },
+  })
+  .then(() => {
+    mediaActions.init();
+  })
+  .catch(() => {});
 
 const {
   useStore: useAudio,
@@ -50,8 +55,6 @@ audio.subscribe('AUDIO_X_STATE', (audioState: AudioState) => {
     audio.playNext();
   }
 });
-
-mediaActions.restoreMediaState();
 
 export {
   audio,

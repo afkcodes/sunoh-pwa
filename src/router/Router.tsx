@@ -1,31 +1,87 @@
-import { Route, Routes, useLocation } from 'react-router';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Fragment, useEffect, useState } from 'react';
+import { Route, Switch } from 'wouter';
+import BottomSheet from '~components/BottomSheet/BottomSheet';
+import MiniPlayer from '~components/MiniPlayer/MiniPlayer';
+import PlayerScreen from '~components/Player/Player';
+import BottomNavContainer from '~containers/BottomNavContainer';
 import { LayoutContainer } from '~containers/LayoutContainer';
-import { modalRoutes, routes } from './routes';
+import { routes } from './routes';
+
+const Modal = ({
+  children,
+  isOpen,
+  onClose,
+}: {
+  children: React.ReactNode;
+  isOpen: boolean;
+  onClose: () => void;
+}) => {
+  if (!isOpen) return null;
+  return (
+    <div className='w-full h-full'>
+      <BottomSheet isOpen={isOpen} onClose={onClose}>
+        {children}
+      </BottomSheet>
+    </div>
+  );
+};
 
 const Router = () => {
-  const location = useLocation();
-  const background = location.state && location.state.background;
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const toggleModal = () => {
+    const currentUrl = new URL(window.location.href);
+    if (isModalOpen) {
+      currentUrl.searchParams.delete('modal');
+    } else {
+      currentUrl.searchParams.set('modal', 'open');
+    }
+    window.history.pushState({}, '', currentUrl.toString());
+    setIsModalOpen(!isModalOpen);
+  };
+
+  const closeModal = () => {
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.delete('modal');
+    window.history.back();
+    setIsModalOpen(false);
+  };
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const currentUrl = new URL(window.location.href);
+      setIsModalOpen(currentUrl.searchParams.get('modal') === 'open');
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    // Initial check for modal query param
+    const currentUrl = new URL(window.location.href);
+    setIsModalOpen(currentUrl.searchParams.get('modal') === 'open');
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
 
   return (
-    <div className='min-h-dvh'>
-      <Routes location={background || location}>
-        <Route path='/' element={<LayoutContainer />}>
+    <Fragment>
+      <LayoutContainer>
+        <Switch>
           {routes.map((route) => (
-            <Route path={route.path} element={route.element} key={route.path} />
+            <Route path={route.path} component={route.element as any} key={route.path} />
           ))}
-          {modalRoutes.map((route) => (
-            <Route path={route.path} element={route.element} key={route.path} />
-          ))}
-        </Route>
-      </Routes>
-      {background && (
-        <Routes>
-          {modalRoutes.map((route) => (
-            <Route path={route.path} element={route.element} key={route.path} />
-          ))}
-        </Routes>
-      )}
-    </div>
+        </Switch>
+      </LayoutContainer>
+      <div onClick={toggleModal}>
+        <MiniPlayer />
+      </div>
+      <BottomNavContainer />
+      <Modal isOpen={isModalOpen} onClose={closeModal}>
+        <PlayerScreen />
+      </Modal>
+    </Fragment>
   );
 };
 

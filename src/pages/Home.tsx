@@ -1,10 +1,10 @@
 import { Fragment } from 'react';
+import { useLocation } from 'wouter';
 import { componentConfig } from '~configs/component.config';
 import { dataConfigs } from '~configs/data.config';
 import SectionContainer from '~containers/SectionContainer';
 import { mediaActions } from '~helper/mediaActions';
 import useFetch from '~hooks/useFetch';
-import useHistory from '~hooks/useHistory';
 import useScrollToTop from '~hooks/useScrollToTop';
 import { endpoints } from '~network/endpoints';
 import http from '~network/http';
@@ -16,25 +16,28 @@ const Home = () => {
     queryFn: async () => await http(endpoints.saavn.home),
   });
 
-  const { push } = useHistory();
+  const [, navigate] = useLocation();
 
   const onClick = (category: string, token: string, item: any) => {
     if (category === 'album') {
-      push(`/album/${token}`);
+      navigate(`/album/${token}`);
     }
     if (category === 'playlist') {
-      push(`/playlist/${token}`);
+      navigate(`/playlist/${token}`);
     }
     if (category === 'mix') {
-      push(`/playlist/${token}?type=mix`);
+      navigate(`/playlist/${token}?category=mix`);
     }
     if (category === 'radio_station') {
-      mediaActions.createSaavnRadioAndPlay(item, '160kbps');
+      mediaActions
+        .createSaavnRadioAndPlay(item, '160kbps')
+        .then(() => {})
+        .catch(() => {});
     }
   };
 
   const onActionHeaderClick = () => {
-    push(`/radio`);
+    navigate(`/radio`);
   };
 
   return (

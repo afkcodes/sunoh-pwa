@@ -1,14 +1,16 @@
 import * as RangeSlider from '@radix-ui/react-slider';
 
 import { Preset } from 'audio_x';
-import { LucideAudioWaveform, Music } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { LuMusic } from 'react-icons/lu';
 import {
+  RiEqualizer3Line,
   RiSpeakerFill,
   RiSubtractFill,
   RiVolumeMuteLine,
   RiVolumeUpLine,
 } from 'react-icons/ri';
+import { presets } from '~constants/presets';
 import { storage } from '~helper/storage';
 import { audio } from '~states/audioStore';
 import Button from './Button/Button';
@@ -16,7 +18,7 @@ import Slider from './Slider/Slider';
 import TextLink from './TextLink/TextLink';
 
 const Equalizer = () => {
-  const defaultPresets = audio.getPresets();
+  const defaultPresets = presets;
   const [activePreset, setActivePreset] = useState<Preset>(defaultPresets[0]);
   const [levels, setLevels] = useState(Array(10).fill(0));
   const [virtualSurround, setVirtualSurround] = useState(false);
@@ -66,9 +68,9 @@ const Equalizer = () => {
   // };
 
   return (
-    <div className='h-screen p-2 mx-auto text-white bg-gradient-to-b from-gray-900 to-black'>
+    <div className='w-full h-screen p-2 mx-auto text-white bg-gradient-to-b from-gray-900 to-black'>
       <h2 className='flex items-center mb-4 text-2xl font-bold'>
-        <Music className='mr-2' /> Equalizer
+        <LuMusic className='mr-2' /> Equalizer
       </h2>
 
       <p className='mb-2 text-gray-400'>Presets</p>
@@ -168,7 +170,7 @@ const Equalizer = () => {
         <div className='flex items-center justify-between px-2 py-4 rounded-sm'>
           <div className='flex items-center'>
             <div>
-              <LucideAudioWaveform size={22} />
+              <RiEqualizer3Line size={22} />
             </div>
             <div className='ml-2'>
               <TextLink>Surround Virtualizer</TextLink>

@@ -23,6 +23,7 @@ const mediaActions = {
     if (!queueLength || data.id !== getAudioSnapshot().currentPlaybackSource) {
       const tracks = data?.list?.map((item: any) => createMediaTrack(item, quality));
       audio.addQueue(tracks, 'DEFAULT');
+      //typescript-eslint.io/rules/no-unsafe-call
       audio.addMediaAndPlay();
       setAudioStore({ currentPlaybackSource: data.id });
     }
@@ -42,7 +43,7 @@ const mediaActions = {
   },
 
   saveMediaState: () => {
-    let mediaState: MediaState = {} as MediaState;
+    const mediaState: MediaState = {} as MediaState;
 
     let lastSaved = 0;
     const saveState = () => {
@@ -83,12 +84,12 @@ const mediaActions = {
   getMediaState: () => {
     const mediaState = storage.getItem('media_state');
     if (mediaState) {
-      return JSON.parse(mediaState);
+      return JSON.parse(mediaState) as MediaState;
     }
   },
 
-  restoreMediaState: async () => {
-    const mediaState: MediaState = mediaActions.getMediaState();
+  restoreMediaState: () => {
+    const mediaState: MediaState = mediaActions.getMediaState() as MediaState;
     if (mediaState?.queue) {
       audio.addQueue(mediaState?.queue, 'DEFAULT');
     }
@@ -143,12 +144,14 @@ const mediaActions = {
       const id = dataExtractor(data, dataConfigs.radio.id);
       const name = dataExtractor(data, dataConfigs.radio.name);
 
-      let currentStation = storage.getItem('current_station')
+      const currentStation = storage.getItem('current_station')
         ? JSON.parse(storage.getItem('current_station') as string)
         : null;
 
       storage.setItem('current_station', JSON.stringify(currentStation));
-      const res = (await http(`${endpoints.gaana.radio.detail}/${id}`)) as Response;
+      const res = (await http(
+        `${endpoints.gaana.radio.detail}/${id as string}`
+      )) as Response;
 
       if (res && isValidArray(res.data)) {
         const tracks = res.data?.map((item: any) => createMediaTrack(item, '12kbps'));

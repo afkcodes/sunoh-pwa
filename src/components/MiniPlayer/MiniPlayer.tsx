@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   RiHeartFill,
   RiHeartLine,
@@ -7,23 +7,18 @@ import {
   RiPlayMiniFill,
   RiRfidLine,
 } from 'react-icons/ri';
-import { Link, useLocation } from 'react-router-dom';
-import BottomSheet from '~components/BottomSheet/BottomSheet';
 import Button from '~components/Button/Button';
 import Figure from '~components/Figure/Figure';
-import PlayerScreen from '~components/Player/Player';
 import TextLink from '~components/TextLink/TextLink';
 import { getDominantColor } from '~helper/colorExtractor';
 import { getColorWithOpacity, rgbToHex } from '~helper/common';
 import { mediaActions } from '~helper/mediaActions';
 import { useAudio } from '~states/audioStore';
 
-const MiniPlayer = () => {
+const MiniPlayer: React.FC = () => {
   const [audioState] = useAudio();
-  const location = useLocation();
   const [isLiked, setIsLiked] = useState(false);
   const [isJamming, setIsJamming] = useState(false);
-  const [isPlayerExpanded, setPlayerExpanded] = useState(false);
   const isPlaying = audioState.playbackState === 'playing';
   const [color, setColor] = useState('');
 
@@ -34,13 +29,19 @@ const MiniPlayer = () => {
   useEffect(() => {
     getDominantColor(
       audioState.currentTrack.artwork ? audioState.currentTrack.artwork[0].src : ''
-    ).then((res) => {
-      const arr = res?.split(',');
-      setColor(rgbToHex(Number(arr[0]), Number(arr[1]), Number(arr[2])));
-    });
+    )
+      .then((res) => {
+        const arr = res?.split(',');
+        setColor(rgbToHex(Number(arr[0]), Number(arr[1]), Number(arr[2])));
+      })
+      .catch(() => {});
   }, [audioState.currentTrack]);
 
-  return audioState.currentTrack.source ? (
+  if (!audioState.currentTrack.source) {
+    return null;
+  }
+
+  return (
     <motion.div
       style={{
         backgroundColor: getColorWithOpacity(color, 0.3),
@@ -51,7 +52,6 @@ const MiniPlayer = () => {
       transition={{ type: 'spring', stiffness: 100 }}
       className='fixed left-0 right-0 overflow-hidden bottom-16 bg-nav-background/90 backdrop-blur-md mini-player'>
       <div className='relative h-16 max-w-lg mx-auto'>
-        {/* Progress Animation */}
         <motion.div
           className='absolute inset-0 bg-gradient-to-r from-surface/20 to-white/15'
           initial={{ right: '100%' }}
@@ -65,10 +65,7 @@ const MiniPlayer = () => {
           transition={{ duration: 1, ease: 'linear' }}
         />
 
-        <Link
-          to='player'
-          state={{ background: location }}
-          className='relative z-10 flex items-center justify-between h-16 px-3'>
+        <div className='relative z-10 flex items-center justify-between h-16 px-3'>
           <div>
             <Figure
               src={[
@@ -117,23 +114,17 @@ const MiniPlayer = () => {
             </Button>
             <Button
               variant='unstyled'
-              classNames='p-0 m-0 active:scale-[90%]'
-              onClick={onPlayOrPause}>
+              classNames='p-0 m-0 active:scale-[90%] text-text-secondary active:text-text-primary'
+              onClick={() => {
+                onPlayOrPause();
+              }}>
               {isPlaying ? <RiPauseMiniFill size={34} /> : <RiPlayMiniFill size={34} />}
             </Button>
           </div>
-        </Link>
+        </div>
       </div>
-      <BottomSheet
-        isOpen={isPlayerExpanded}
-        name='player_sheet'
-        onClose={() => {
-          setPlayerExpanded(false);
-        }}>
-        <PlayerScreen />
-      </BottomSheet>
     </motion.div>
-  ) : null;
+  );
 };
 
 export default MiniPlayer;

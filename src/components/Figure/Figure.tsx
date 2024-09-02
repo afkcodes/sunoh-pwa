@@ -15,7 +15,6 @@ const Figure: React.FC<FigureProps> = ({
   dominantColor = '',
   mode = 'single',
   position = 'center',
-  id,
 }) => {
   const className = merge(
     figureStyles({ radius, size }),

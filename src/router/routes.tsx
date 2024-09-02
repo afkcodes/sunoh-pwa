@@ -1,82 +1,36 @@
-import { lazy, Suspense } from 'react';
-import BottomSheet from '~components/BottomSheet/BottomSheet';
-import PlayerScreen from '~components/Player/Player';
+/* eslint-disable react-refresh/only-export-components */
+import AlbumScreen from '~pages/Album';
+import Home from '~pages/Home';
+import Library from '~pages/Library';
 import PlaylistScreen from '~pages/Playlist';
-
-const Home = lazy(() => import('~pages/Home'));
-const Search = lazy(() => import('~pages/Search'));
-const Library = lazy(() => import('~pages/Library'));
-const AlbumScreen = lazy(() => import('~pages/Album'));
-const Radio = lazy(() => import('~pages/Radio'));
+import Radio from '~pages/Radio';
+import SearchScreen from '~pages/Search';
 
 const routes = [
   {
     path: '/home',
-    element: (
-      <Suspense fallback={<div>loading</div>}>
-        <Home />
-      </Suspense>
-    ),
+    element: Home,
   },
   {
     path: '/search',
-    element: (
-      <Suspense fallback={<div>loading</div>}>
-        <Search />
-      </Suspense>
-    ),
+    element: SearchScreen,
   },
   {
     path: '/library',
-    element: (
-      <Suspense fallback={<div>loading</div>}>
-        <Library />
-      </Suspense>
-    ),
+    element: Library,
   },
   {
     path: '/album/:albumId',
-    element: (
-      <Suspense fallback={<div>loading</div>}>
-        <AlbumScreen />
-      </Suspense>
-    ),
+    element: AlbumScreen,
   },
   {
     path: '/playlist/:playlistId',
-    element: (
-      <Suspense fallback={<div>loading</div>}>
-        <PlaylistScreen />
-      </Suspense>
-    ),
+    element: PlaylistScreen,
   },
   {
     path: '/radio',
-    element: (
-      <Suspense fallback={<div>loading</div>}>
-        <Radio />
-      </Suspense>
-    ),
+    element: Radio,
   },
 ];
 
-const modalRoutes = [
-  {
-    path: '/player',
-    element: (
-      <BottomSheet isOpen name='Player sheet'>
-        <PlayerScreen />
-      </BottomSheet>
-    ),
-  },
-  {
-    path: '/eq',
-    element: (
-      <BottomSheet isOpen name='Player sheet'>
-        <PlayerScreen />
-      </BottomSheet>
-    ),
-  },
-];
-
-export { modalRoutes, routes };
+export { routes };

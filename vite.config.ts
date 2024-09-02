@@ -12,7 +12,6 @@ export default defineConfig({
           react: ['react'],
           rDom: ['react-dom'],
           fm: ['framer-motion'],
-          rrDom: ['react-router-dom'],
         },
       },
     },
@@ -47,16 +46,56 @@ export default defineConfig({
       },
 
       pwaAssets: {
-        disabled: false,
+        disabled: true,
         config: true,
+        overrideManifestIcons: false,
       },
 
       manifest: {
         name: 'sunoh',
-        short_name: 'sunoh',
-        description: 'music app',
+        short_name: 'Sunoh',
+        description: 'Sunoh dil ki dhun',
         theme_color: '#0a0a0a',
+        background_color: '#0a0a0a',
         start_url: '/',
+        icons: [
+          {
+            purpose: 'maskable',
+            sizes: '1024x1024',
+            src: 'maskable_icon.png',
+            type: 'image/png',
+          },
+          {
+            purpose: 'maskable',
+            sizes: '72x72',
+            src: 'maskable_icon_x72.png',
+            type: 'image/png',
+          },
+          {
+            purpose: 'maskable',
+            sizes: '96x96',
+            src: 'maskable_icon_x96.png',
+            type: 'image/png',
+          },
+          {
+            purpose: 'any',
+            sizes: '144x144',
+            src: 'maskable_icon_x144.png',
+            type: 'image/png',
+          },
+          {
+            purpose: 'maskable',
+            sizes: '192x192',
+            src: 'maskable_icon_x192.png',
+            type: 'image/png',
+          },
+          {
+            purpose: 'maskable',
+            sizes: '512x512',
+            src: 'maskable_icon_x512.png',
+            type: 'image/png',
+          },
+        ],
       },
 
       injectManifest: {

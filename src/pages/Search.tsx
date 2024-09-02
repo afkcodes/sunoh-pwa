@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { RiSearch2Line } from 'react-icons/ri';
 import Button from '~components/Button/Button';
@@ -24,16 +28,16 @@ const SearchScreen: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const pillsRef = useRef<HTMLDivElement>(null);
 
-  const { data, refetch, isSuccess, isError } = useFetch({
+  const { data, refetch, isSuccess } = useFetch({
     queryKey: [`search_${searchTerm}_${activeCategory}`],
     queryFn: async () =>
       await http(`${endpoints.saavn.search}?q=${searchTerm}&type=${activeCategory}`),
     shouldFetchOnLoad: false,
   });
 
-  const handleClearSearch = () => {
-    setSearchTerm('');
-  };
+  // const handleClearSearch = () => {
+  //   setSearchTerm('');
+  // };
 
   const handleCategoryChange = (category: string) => {
     const pillElement = document.getElementById(`pill-${category}`);

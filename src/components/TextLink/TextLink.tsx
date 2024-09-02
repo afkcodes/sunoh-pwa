@@ -46,7 +46,8 @@
 // export default TextLink;
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+
+import { Link } from 'wouter';
 import { merge } from '~helper/twMerge.config';
 import { TextLinkProps } from '../../types/component.types';
 import { textStyles } from './textLink.styles';

@@ -2,7 +2,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { LuChevronLeft, LuHeart, LuMoreVertical, LuShuffle } from 'react-icons/lu';
 import { RiPauseMiniFill, RiPlayMiniFill, RiShareForwardLine } from 'react-icons/ri';
-import { useParams } from 'react-router';
+import { useParams } from 'wouter';
 import Button from '~components/Button/Button';
 import Figure from '~components/Figure/Figure';
 import TextLink from '~components/TextLink/TextLink';

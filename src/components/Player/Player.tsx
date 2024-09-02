@@ -271,8 +271,6 @@ const PlayerScreen = () => {
       </div>
       <BottomSheet
         isOpen={isQueueVisible}
-        dismissible={false}
-        name='queue_sheet'
         onClose={() => {
           setIsQueueVisible(false);
         }}>
@@ -285,8 +283,6 @@ const PlayerScreen = () => {
 
       <BottomSheet
         isOpen={isEqVisible}
-        dismissible={false}
-        name='eq_sheet'
         onClose={() => {
           setEqVisible(false);
         }}>

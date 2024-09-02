@@ -1,30 +1,20 @@
-import { useNavigate } from 'react-router';
 import { Drawer } from 'vaul';
-import { BottomSheetProps } from '~types/component.types';
-const BottomSheet: React.FC<BottomSheetProps> = ({
+
+const BottomSheet = ({
+  children,
   isOpen,
   onClose,
-  children,
-  name,
-  dismissible = true,
+}: {
+  children: React.ReactNode;
+  isOpen: boolean;
+  onClose: () => void;
 }) => {
-  const navigate = useNavigate();
-
-  const handleClose = () => {
-    if (onClose) {
-      onClose();
-    }
-    navigate(-1);
-  };
-
   return (
-    <Drawer.Root open={isOpen} onClose={handleClose} dismissible={dismissible}>
+    <Drawer.Root open={isOpen} onClose={onClose}>
       <Drawer.Portal>
         <Drawer.Overlay className='fixed inset-0 bg-black/40' />
-        <Drawer.Content
-          className='fixed bottom-0 left-0 right-0 z-10 overflow-hidden border-none outline-none'
-          aria-describedby='modal content'>
-          <Drawer.Title className='sr-only'>{name}</Drawer.Title>
+        <Drawer.Content className='z-50 flex flex-col rounded-t-[10px] mt-24 fixed bottom-0 left-0 right-0'>
+          <Drawer.Title className='sr-only'>sunoh modal</Drawer.Title>
           <Drawer.Description className='sr-only'>
             Bottom Sheet Content Main
           </Drawer.Description>

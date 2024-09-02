@@ -6,7 +6,7 @@ import { mediaActions } from '~helper/mediaActions';
 import { endpoints } from '~network/endpoints';
 import http from '~network/http';
 
-const InfiniteScrollGrid: React.FC = () => {
+const Radio: React.FC = () => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: ['radios'],
     queryFn: async (param) => {
@@ -132,4 +132,4 @@ const InfiniteScrollGrid: React.FC = () => {
   );
 };
 
-export default InfiniteScrollGrid;
+export default Radio;
