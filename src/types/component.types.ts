@@ -60,3 +60,22 @@ export interface TextLinkProps extends VariantProps<typeof textStyles> {
   href?: string;
   classNames?: string;
 }
+
+export interface TileProps {
+  figureConfig: Omit<FigureProps, 'alt' | 'src'>;
+  titleConfig: Omit<TextLinkProps, 'children'>;
+  subTitleConfig: Omit<TextLinkProps, 'children'>;
+  data: any;
+  config: any;
+  onClick: () => void;
+}
+
+export type Role = 'drawer' | 'modal';
+
+export interface ModalProps {
+  isOpen: boolean;
+  children?: React.ReactElement | React.ReactNode;
+  onClose?: () => void;
+  role?: Role;
+  closeOnOutsidePress?: boolean;
+}

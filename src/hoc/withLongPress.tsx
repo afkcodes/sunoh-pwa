@@ -1,4 +1,4 @@
-import { ComponentType, useState } from 'react';
+import { ComponentType, useEffect, useState } from 'react';
 
 interface WithLongPressProps {
   onLongPress: () => void;
@@ -26,9 +26,15 @@ const withLongPress = <P extends object>(
       }
     };
 
+    useEffect(() => {
+      return () => {
+        handleTouchEnd();
+      };
+    });
+
     return (
       <div
-        className='z-0 active:bg-transparent'
+        className='active:bg-transparent'
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}>
         <WrappedComponent {...props} />

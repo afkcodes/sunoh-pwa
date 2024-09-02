@@ -1,15 +1,19 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useBottomSheet } from '~contexts/BottomSheetContext';
 import useHistory from './useHistory';
 
 const useViewTransition = () => {
   const location = useLocation();
   const lastPathRef = useRef(location.pathname);
   const { push, back } = useHistory();
+  const { isOpen } = useBottomSheet();
+  let wasModalOpened = useRef(false);
 
   useLayoutEffect(() => {
     lastPathRef.current = location.pathname;
-  }, [location]);
+    wasModalOpened.current = isOpen;
+  }, [location, isOpen]);
 
   const startViewTransition = (to: string, isBack = false) => {
     document.documentElement.classList.toggle('back-transition', isBack);
@@ -20,7 +24,13 @@ const useViewTransition = () => {
       return;
     }
 
+    console.log({ isOpen });
+
     if (isBack) {
+      if (wasModalOpened.current) {
+        back();
+        return;
+      }
       document.startViewTransition(() => {
         back();
       });

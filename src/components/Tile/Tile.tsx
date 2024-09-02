@@ -2,16 +2,7 @@ import Button from '~components/Button/Button';
 import Figure from '~components/Figure/Figure';
 import TextLink from '~components/TextLink/TextLink';
 import { dataExtractor } from '~helper/common';
-import { FigureProps, TextLinkProps } from '~types/component.types';
-
-interface TileProps {
-  figureConfig: Omit<FigureProps, 'alt' | 'src'>;
-  titleConfig: Omit<TextLinkProps, 'children'>;
-  subTitleConfig: Omit<TextLinkProps, 'children'>;
-  data: any;
-  config: any;
-  onClick: () => void;
-}
+import { TileProps } from '~types/component.types';
 
 const Tile: React.FC<TileProps> = ({
   data,

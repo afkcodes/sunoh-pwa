@@ -1,9 +1,11 @@
 import Tile from '~components/Tile/Tile';
+import { useBottomSheet } from '~contexts/BottomSheetContext';
 
 import useViewTransition from '~hooks/useViewTransition';
 
 const Home = () => {
   const navigate = useViewTransition();
+  const { openSheet } = useBottomSheet();
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -11,11 +13,18 @@ const Home = () => {
 
   return (
     <div className='w-full h-full bg-background'>
-      <div className='z-0 grid w-full grid-cols-2 gap-8 pt-2'>
+      <div className='grid w-full grid-cols-2 gap-8 pt-2'>
         {[1, 2, 3, 4, 8, 5, 6, 55, 6, 77, 88, 888, 8888, 12].map((item) => (
           <Tile
             onClick={() => {
               handleNavigate('/search');
+            }}
+            onLongPress={() => {
+              openSheet({
+                isOpen: true,
+                children: <div className='h-96'>hello</div>,
+                onClose: () => {},
+              });
             }}
             key={item}
             figureConfig={{

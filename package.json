@@ -20,7 +20,8 @@
     "react-router": "^6.24.1",
     "react-router-dom": "^6.24.1",
     "tailwind-merge": "^2.3.0",
-    "valtio": "^1.13.2"
+    "valtio": "^1.13.2",
+    "vaul": "^0.9.1"
   },
   "devDependencies": {
     "@types/react": "^18.3.1",

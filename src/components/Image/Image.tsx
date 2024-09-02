@@ -37,7 +37,7 @@ const Image: React.FC<ImageProps> = ({
       loading={loading}
       onLoad={onLoad}
       onError={onError}
-      className={` h-full w-full z-0 ${fitStrategy[fit]} ${imgPosition[position]}`}
+      className={` h-full w-full ${fitStrategy[fit]} ${imgPosition[position]}`}
     />
   );
 };
