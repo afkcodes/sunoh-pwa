@@ -1,3 +1,5 @@
+import { MediaTrack } from 'audio_x';
+
 export const isValidFunction = (fun: any) => typeof fun === 'function';
 export const isValidArray = (arr: any[]) => arr && Array.isArray(arr) && arr.length > 0;
 export const isValidWindow = window instanceof Window && typeof window !== 'undefined';
@@ -215,30 +217,10 @@ export const isColorDark = (color: string) => {
   return brightness < threshold;
 };
 
-// export const createMediaTrack = (item: any) => {
-//   const title = dataExtractor(item, SONG_H_CONFIG.title);
-//   const subtitle = dataExtractor(item, SONG_H_CONFIG.singer).join(', ');
-//   const image = dataExtractor(item, SONG_H_CONFIG.image);
-//   const url = dataExtractor(item, SONG_H_CONFIG.url);
-//   const mediaTrack: MediaTrack = {
-//     id: item._id,
-//     artwork: [
-//       {
-//         src: image,
-//         name: title,
-//         sizes: '200x200',
-//       },
-//     ],
-//     source: url,
-//     title: title,
-//     artist: subtitle,
-//   };
-
-//   return mediaTrack;
-// };
-
-export const getUniqueId = () =>
-  Date.now().toString(36) + Math.random().toString(36).substr(2);
+interface MediaUrl {
+  quality: string;
+  link: string;
+}
 
 interface Artist {
   name: string;
@@ -246,6 +228,54 @@ interface Artist {
   image: Array<{ quality: string; link: string }>;
   type: string;
 }
+type MediaQuality = '12kbps' | '48kbps' | '96kbps' | '160kbps' | '320kbps';
+
+export const createMediaTrack = (data: any, mediaQuality: MediaQuality): MediaTrack => {
+  // Find the media URL with the specified quality
+  const selectedMediaUrl =
+    data.mediaUrls.find((url: MediaUrl) => url.quality === mediaQuality) ||
+    data.mediaUrls[data.mediaUrls.length - 1];
+
+  // Extract artist names and join them with a comma, ensuring uniqueness
+  // const artistNames = [
+  //   ...new Set(data.artists.map((artist: Artist) => artist.name)),
+  // ].join(', ');
+
+  // Convert to MediaTrack format
+  const track: MediaTrack = {
+    id: data.id,
+    artwork: [
+      {
+        src: data?.images[2]?.link || data.images,
+        name: data.title,
+        sizes: '500x500',
+      },
+      {
+        src: data?.images[1]?.link || data.images,
+        name: data.title,
+        sizes: '150x150',
+      },
+      {
+        src: data?.images[0]?.link || data.images,
+        name: data.title,
+        sizes: '50x50',
+      },
+    ],
+    source: selectedMediaUrl.link,
+    title: decodeHtmlEntities(data.title),
+    album: decodeHtmlEntities(data.album),
+    artist: decodeHtmlEntities(data.music),
+    comment: '',
+    duration: parseInt(data.duration),
+    genre: '', // Assuming genre is not provided in the given data
+    year: parseInt(data.year),
+  };
+
+  return track;
+};
+
+export const getUniqueId = () =>
+  Date.now().toString(36) + Math.random().toString(36).substr(2);
 
 type ArtistsInput = Artist[] | string;
 
@@ -272,18 +302,18 @@ export function decodeHtmlEntities(text: string): string {
 }
 
 export function timeToReadable(seconds: number) {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = seconds % 60;
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
 
-  if (hours > 0) {
-    return `${hours}:${minutes.toString().padStart(2, '0')}:${secs
+  if (hrs > 0) {
+    return `${hrs}:${mins.toString().padStart(2, '0')}:${secs
       .toString()
       .padStart(2, '0')}`;
-  } else if (minutes > 0) {
-    return `${minutes}:${secs.toString().padStart(2, '0')}`;
+  } else if (mins > 0) {
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   } else {
-    return `0:${secs}`;
+    return `0:${secs.toString().padStart(2, '0')}`;
   }
 }
 

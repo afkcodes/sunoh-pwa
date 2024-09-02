@@ -3,14 +3,12 @@ import Button from '~components/Button/Button';
 import TextLink from '~components/TextLink/TextLink';
 import { NavItems, navItems } from '~constants/navigation';
 import useViewTransition from '~hooks/useViewTransition';
-import { tabActions } from '~states/tabState';
 
 const BottomNavContainer = () => {
   const location = useLocation();
   const startViewTransition = useViewTransition();
 
-  const onClick = (path: string, id: number) => {
-    tabActions.setTab(id);
+  const onClick = (path: string) => {
     startViewTransition(path);
   };
 
@@ -24,7 +22,7 @@ const BottomNavContainer = () => {
             variant='unstyled'
             classNames='w-full'
             onClick={() => {
-              onClick(item.path, item.id);
+              onClick(item.path);
             }}>
             <div className='flex flex-col items-center justify-center'>
               <item.icon

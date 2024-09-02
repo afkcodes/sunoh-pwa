@@ -1,5 +1,6 @@
 import AudioItem from '~components/AudioItem/AudioItem';
-import { isValidArray } from '~helper/common';
+import { createMediaTrack, isValidArray } from '~helper/common';
+import { audio, useAudio } from '~states/audioStore';
 import { AudioItemContainerProps } from '~types/component.types';
 
 const AudioItemContainer: React.FC<AudioItemContainerProps> = ({
@@ -7,6 +8,13 @@ const AudioItemContainer: React.FC<AudioItemContainerProps> = ({
   config,
   audioItemConfig,
 }) => {
+  const [audioState] = useAudio();
+
+  const play = (item: any) => {
+    const mediaTrack = createMediaTrack(item, '160kbps');
+    audio.addMediaAndPlay(mediaTrack);
+  };
+
   return (
     <div>
       {isValidArray(data)
@@ -15,12 +23,13 @@ const AudioItemContainer: React.FC<AudioItemContainerProps> = ({
               <AudioItem
                 data={song}
                 config={config}
-                onClick={audioItemConfig.onClick}
-                onOptionsClick={audioItemConfig.onOptionsClick}
+                onClick={play}
+                onOptionsClick={() => {}}
                 type={audioItemConfig.type}
-                isPlaying={false}
-                currentProgress={50}
+                playbackState={audioState.playbackState}
+                currentProgress={audioState.progress as number}
                 index={index + 1}
+                currentTrackId={audioState.currentTrack.id as string}
               />
             </div>
           ))

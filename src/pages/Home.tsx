@@ -4,10 +4,12 @@ import { dataConfigs } from '~configs/data.config';
 import SectionContainer from '~containers/SectionContainer';
 import useFetch from '~hooks/useFetch';
 import useHistory from '~hooks/useHistory';
+import useScrollToTop from '~hooks/useScrollToTop';
 import { endpoints } from '~network/endpoints';
 import http from '~network/http';
 
 const Home = () => {
+  useScrollToTop();
   const { data, isSuccess } = useFetch({
     queryKey: ['home'],
     queryFn: async () => await http(endpoints.saavn.home),
@@ -18,6 +20,9 @@ const Home = () => {
   const onClick = (category: string, token: string) => {
     if (category === 'album') {
       push(`/album/${token}`);
+    }
+    if (category === 'playlist') {
+      push(`/playlist/${token}`);
     }
   };
 

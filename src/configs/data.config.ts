@@ -9,10 +9,12 @@ const dataConfigs = {
     editor: 'editorFirstName',
   },
   audio: {
+    id: 'id',
     title: 'title',
     subtitle: 'subtitle',
     image: 'images.1.link',
     duration: 'duration',
+    artist: 'artist',
   },
 };
 

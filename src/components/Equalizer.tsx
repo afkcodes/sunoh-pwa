@@ -1,5 +1,6 @@
 import * as RangeSlider from '@radix-ui/react-slider';
 
+import { Preset } from 'audio_x';
 import { LucideAudioWaveform, Music } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import {
@@ -8,43 +9,50 @@ import {
   RiVolumeMuteLine,
   RiVolumeUpLine,
 } from 'react-icons/ri';
+import { presets } from '~constants/presets';
+import { storage } from '~helper/storage';
+import { audio } from '~states/audioStore';
 import Button from './Button/Button';
 import Slider from './Slider/Slider';
 import TextLink from './TextLink/TextLink';
 
 const Equalizer = () => {
-  const [activePreset, setActivePreset] = useState('Custom');
+  const defaultPresets = presets;
+  const [activePreset, setActivePreset] = useState<Preset>(defaultPresets[0]);
   const [levels, setLevels] = useState(Array(10).fill(0));
   const [virtualSurround, setVirtualSurround] = useState(false);
-  const [customPresets, setCustomPresets] = useState([]);
+  // const [customPresets, setCustomPresets] = useState([]);
+  const [bassBoostActive, setBassBoostActive] = useState(false);
 
-  const defaultPresets = ['Vocal', 'Acoustic', 'Flat', 'Classic', 'Pop', 'Rock', 'Jazz'];
   const frequencies = ['32', '64', '125', '250', '500', '1k', '2k', '4k', '8k', '16k'];
 
   useEffect(() => {
-    const savedPresets = localStorage.getItem('customPresets');
-    if (savedPresets) {
-      setCustomPresets(JSON.parse(savedPresets));
+    // const savedPresets = localStorage.getItem('customPresets');
+
+    const lastActivePreset = storage.getItem('current_preset');
+    const currentPreset = JSON.parse(lastActivePreset || '{}');
+    if (currentPreset?.id && currentPreset?.id !== activePreset.id) {
+      setActivePreset(currentPreset);
+      setLevels(currentPreset.gains);
+      // audio.setPreset(currentPreset.id as keyof Preset);
     }
+    console.log('called rendered');
   }, []);
 
-  const handlePresetChange = (preset: any) => {
+  const handlePresetChange = (preset: Preset) => {
     setActivePreset(preset);
-    if (preset !== 'Custom') {
-      // In a real app, you'd fetch actual preset values
-      setLevels(
-        Array(10)
-          .fill(0)
-          .map(() => Math.floor(Math.random() * 25) - 12)
-      );
-    }
+    setLevels(preset.gains);
+    audio.setCustomEQ(preset.gains);
+    storage.setItem('current_preset', JSON.stringify(preset));
   };
 
   const handleSliderChange = (index: any, newValue: any) => {
     const newLevels = [...levels];
     newLevels[index] = newValue[0];
     setLevels(newLevels);
-    setActivePreset('Custom');
+    audio.setCustomEQ(newLevels);
+
+    // setCustomPresets('Custom');
   };
 
   // const saveCustomPreset = () => {
@@ -53,7 +61,8 @@ const Equalizer = () => {
   //     const newPreset = { name: presetName, levels: [...levels] };
   //     const updatedPresets = [...customPresets, newPreset];
   //     setCustomPresets(updatedPresets as any);
-  //     localStorage.setItem('customPresets', JSON.stringify(updatedPresets));
+  //     localStorage.setItem('custom_preset', JSON.stringify(updatedPresets));
+  //     audio.setCustomEQ(customPresets);
   //   }
   // };
 
@@ -71,21 +80,19 @@ const Equalizer = () => {
       <p className='mb-2 text-gray-400'>Presets</p>
       <div className='mb-6 overflow-x-auto no-scrollbar'>
         <div className='flex pb-2 space-x-4'>
-          {[...defaultPresets, ...customPresets.map((preset: any) => preset.name)].map(
-            (preset) => (
-              <Button
-                key={preset}
-                classNames={`px-3 py-1 rounded-full text-sm whitespace-nowrap duration-150 
+          {[...defaultPresets].map((preset) => (
+            <Button
+              key={preset.name}
+              classNames={`px-3 py-1 rounded-full text-sm whitespace-nowrap duration-150 
                 ${
-                  activePreset === preset
+                  activePreset.id === preset.id
                     ? 'bg-primary-default text-white'
                     : 'bg-gray-800 text-gray-400'
                 }`}
-                onClick={() => handlePresetChange(preset)}>
-                {preset}
-              </Button>
-            )
-          )}
+              onClick={() => handlePresetChange(preset)}>
+              {preset.name}
+            </Button>
+          ))}
         </div>
       </div>
 
@@ -97,7 +104,7 @@ const Equalizer = () => {
               className='relative flex items-center justify-center flex-1 w-0.5 select-none h-60 touch-none'
               min={-12}
               max={12}
-              step={1}
+              step={0.1}
               value={[levels[index]]}
               onValueChange={(newValue) => handleSliderChange(index, newValue)}>
               <RangeSlider.Track className='relative rounded-full bg-white/60 h-60 backdrop-blur grow'>
@@ -109,7 +116,7 @@ const Equalizer = () => {
               />
             </RangeSlider.Root>
             <span className='mt-3 text-xs text-gray-400'>{freq}</span>
-            <span className='mt-1 text-xs font-bold'>{levels[index]}dB</span>
+            <span className='mt-1 text-xs font-bold'>{Math.floor(levels[index])}dB</span>
           </div>
         ))}
       </div>
@@ -148,12 +155,17 @@ const Equalizer = () => {
           </div>
           <div
             className={`w-10 h-6 rounded-full p-1 cursor-pointer ${
-              virtualSurround ? 'bg-primary-light' : 'bg-gray-600'
+              bassBoostActive ? 'bg-primary-light' : 'bg-gray-600'
             }`}
-            onClick={() => setVirtualSurround(!virtualSurround)}>
+            onClick={() => {
+              !bassBoostActive
+                ? audio.setBassBoost(true, 5)
+                : audio.setBassBoost(false, 0);
+              setBassBoostActive(!bassBoostActive);
+            }}>
             <div
               className={`w-4 h-4 rounded-full bg-white transition-transform ${
-                virtualSurround ? 'transform translate-x-4' : ''
+                bassBoostActive ? 'transform translate-x-4' : ''
               }`}
             />
           </div>

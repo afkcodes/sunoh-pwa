@@ -5,6 +5,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { isValidObject } from '~helper/common';
 import ChangeNotifier, { ActionSet, ListenerCallback } from './notifier';
 
 /**
@@ -73,6 +74,7 @@ const diffChecker = (d1: any, d2: any): boolean => {
  * @param {string} [slice='default_slice'] - The slice identifier..
  * @returns {Object} - Returns an object containing the custom hook and helper functions.
  */
+
 const create = <T>(eventName: string, initState: T, slice: string = 'default_slice') => {
   const notifier = ChangeNotifier.getInstance();
   const prevState = notifier.getState(eventName, slice);
@@ -95,7 +97,7 @@ const create = <T>(eventName: string, initState: T, slice: string = 'default_sli
         if (actionSet[slice]?.size) {
           actionSet[slice].forEach((callback) => {
             if (callback) {
-              checkValidObject(data)
+              isValidObject(data)
                 ? callback((prev: T) => ({ ...prev, ...data } as T))
                 : callback(data as T);
             }
@@ -124,7 +126,7 @@ const create = <T>(eventName: string, initState: T, slice: string = 'default_sli
    * @returns {*} - Returns the state property value.
    */
   const getStateValue = (state: T) => {
-    if (checkValidObject(state)) {
+    if (isValidObject(state)) {
       const proxyState = new Proxy(state as any, {
         get: (_target, prop) => {
           const state: T = notifier.getState(eventName, slice) as T;
@@ -172,7 +174,7 @@ const create = <T>(eventName: string, initState: T, slice: string = 'default_sli
     setTransient: (data: Partial<T>) => {
       notifier.notify(eventName, data, slice, true, 'create_transient');
     },
-    getStoreSnapshot: () => notifier.getState(eventName, slice) as T,
+    getStoreSnapshot: () => notifier.getState(eventName, slice) as T, // use this to retrieve state value
 
     subscribe: (cb: (data: T, actionSet: ActionSet, prevState: T) => void) => {
       notifier.listen(eventName, cb as ListenerCallback<unknown>, initState, slice);
@@ -180,4 +182,15 @@ const create = <T>(eventName: string, initState: T, slice: string = 'default_sli
   };
 };
 
-export { create };
+const notify = (
+  event: string,
+  data: any,
+  slice: string = 'default_slice',
+  transient: boolean = false,
+  caller = 'notifier_global'
+) => {
+  const notifier = ChangeNotifier.getInstance();
+  notifier.notify(event, data, slice, transient, caller);
+};
+
+export { create, notify };

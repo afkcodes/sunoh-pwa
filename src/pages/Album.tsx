@@ -1,3 +1,4 @@
+import { AudioX } from 'audio_x';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import {
@@ -15,9 +16,13 @@ import Figure from '~components/Figure/Figure';
 import TextLink from '~components/TextLink/TextLink';
 import { dataConfigs } from '~configs/data.config';
 import AudioItemContainer from '~containers/AudioItemContainer';
+import AudioStateContainer from '~containers/AudioStateContainer';
+import { createMediaTrack } from '~helper/common';
 import useFetch from '~hooks/useFetch';
+import useScrollToTop from '~hooks/useScrollToTop';
 import { endpoints } from '~network/endpoints';
 import http from '~network/http';
+import { audio, getAudioSnapshot, setAudioStore } from '~states/audioStore';
 
 const AlbumScreen: React.FC = () => {
   const { scrollY } = useScroll();
@@ -48,6 +53,31 @@ const AlbumScreen: React.FC = () => {
     queryFn: async () => await http(`${endpoints.saavn.album}/${albumId}`),
   });
 
+  useScrollToTop();
+
+  const audioInstance = AudioX.getAudioInstance();
+
+  const onShuffle = () => {
+    const tracks = data?.list?.map((item: any) => createMediaTrack(item, '160kbps'));
+    audio.addQueue(tracks, 'SHUFFLE');
+    setAudioStore({ currentPlaybackSource: `${data.id}#shuffle` });
+  };
+
+  const onPlayAll = () => {
+    const queueLength = audio.getQueue().length;
+    if (!queueLength || data.id !== getAudioSnapshot().currentPlaybackSource) {
+      const tracks = data?.list?.map((item: any) => createMediaTrack(item, '160kbps'));
+      audio.addQueue(tracks, 'DEFAULT');
+      audio.addMediaAndPlay();
+      setAudioStore({ currentPlaybackSource: data.id });
+    }
+    if (audioInstance.paused) {
+      audio.play();
+    } else {
+      audio.pause();
+    }
+  };
+
   return (
     <Fragment>
       {isLoading ? (
@@ -63,10 +93,10 @@ const AlbumScreen: React.FC = () => {
               y: isHeaderVisible ? 0 : -20,
             }}
             transition={{ duration: 0.3 }}
-            className='fixed top-0 left-0 right-0 z-20 flex justify-between px-2 py-3 bg-surface bg-opacity-70 backdrop-blur-md'>
+            className='fixed top-0 left-0 right-0 z-20 flex justify-between py-3 bg-surface bg-opacity-70 backdrop-blur-md'>
             <Button
               variant='unstyled'
-              classNames='p-0 m-0 transition-all duration-300 active:scale-90'
+              classNames='p-0 m-0 transition-all duration-300 active:scale-90 pl-4'
               size='md'
               radius='full'
               onClick={togglePlay}>
@@ -79,7 +109,7 @@ const AlbumScreen: React.FC = () => {
             </div>
             <Button
               variant='unstyled'
-              classNames='p-0 m-0 transition-all duration-300 active:scale-90'
+              classNames='p-0 m-0 transition-all duration-300 active:scale-90 pr-3.5'
               size='md'
               radius='full'
               onClick={togglePlay}>
@@ -154,26 +184,33 @@ const AlbumScreen: React.FC = () => {
                   variant='unstyled'
                   size='md'
                   radius='sm'
-                  onClick={togglePlay}
+                  onClick={onShuffle}
                   classNames='p-0 transition-all duration-300 active:scale-90'>
                   <LuShuffle size={22} />
                 </Button>
-                <Button
-                  variant='primary'
-                  classNames='transition-all duration-300 active:scale-90'
-                  radius='full'
-                  size='md'
-                  onClick={togglePlay}
-                  prefixIcon={
-                    false ? (
-                      <LuPause size={22} fill='white' />
-                    ) : (
-                      <LuPlay fill='white' size={22} />
-                    )
-                  }>
-                  {/* Replace with actual Play State */}
-                  {false ? 'PAUSE' : 'PLAY'}
-                </Button>
+                <AudioStateContainer
+                  renderItem={(audioState) => (
+                    <Button
+                      variant='primary'
+                      classNames='transition-all duration-300 active:scale-90'
+                      radius='full'
+                      size='md'
+                      onClick={onPlayAll}
+                      prefixIcon={
+                        audioState.playbackState === 'playing' &&
+                        audioState.currentPlaybackSource === data.id ? (
+                          <LuPause size={22} fill='white' />
+                        ) : (
+                          <LuPlay fill='white' size={22} />
+                        )
+                      }>
+                      {audioState.playbackState === 'playing' &&
+                      audioState.currentPlaybackSource === data.id
+                        ? 'PAUSE'
+                        : 'PLAY'}
+                    </Button>
+                  )}
+                />
               </div>
             </div>
 
@@ -182,8 +219,6 @@ const AlbumScreen: React.FC = () => {
                 data={data.list}
                 config={dataConfigs.audio}
                 audioItemConfig={{
-                  onClick: () => {},
-                  onOptionsClick: () => {},
                   type: 'indexed',
                 }}
               />

@@ -30,8 +30,9 @@ const Slider: React.FC<SliderProps> = ({
     <RangeSlider.Root
       orientation={orientation}
       className='relative flex items-center flex-1 w-full h-5 select-none touch-none'
-      defaultValue={value}
+      defaultValue={[0]}
       onValueChange={onValueChange}
+      value={value}
       max={max}
       min={min}
       step={step}>

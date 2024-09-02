@@ -11,17 +11,17 @@ const Router = () => {
       <Routes location={background || location}>
         <Route path='/' element={<LayoutContainer />}>
           {routes.map((route) => (
-            <Route path={route.path} element={route.element} />
+            <Route path={route.path} element={route.element} key={route.path} />
           ))}
           {modalRoutes.map((route) => (
-            <Route path={route.path} element={route.element} />
+            <Route path={route.path} element={route.element} key={route.path} />
           ))}
         </Route>
       </Routes>
       {background && (
         <Routes>
           {modalRoutes.map((route) => (
-            <Route path={route.path} element={route.element} />
+            <Route path={route.path} element={route.element} key={route.path} />
           ))}
         </Routes>
       )}

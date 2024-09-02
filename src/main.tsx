@@ -1,9 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
 import { domAnimation, LazyMotion } from 'framer-motion';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
+import PWABadge from '~PWABadge';
 import Router from '~router/Router';
 import './index.css';
 
@@ -15,6 +15,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <BrowserRouter>
         <LazyMotion features={domAnimation}>
           <Router />
+          <PWABadge />
         </LazyMotion>
       </BrowserRouter>
     </QueryClientProvider>

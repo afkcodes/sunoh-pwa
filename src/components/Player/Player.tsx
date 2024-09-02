@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { MdLyrics, MdOutlineLyrics } from 'react-icons/md';
 import {
   RiEqualizer3Line,
@@ -21,61 +21,41 @@ import BottomSheet from '~components/BottomSheet/BottomSheet';
 import Button from '~components/Button/Button';
 import Equalizer from '~components/Equalizer';
 import Figure from '~components/Figure/Figure';
-import Marquee from '~components/Marquee/Marquee';
 import QueueList from '~components/QueueList';
 import Slider from '~components/Slider/Slider';
 import TextLink from '~components/TextLink/TextLink';
+import { timeToReadable } from '~helper/common';
+import { audio, useAudio } from '~states/audioStore';
 
 const PlayerScreen = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [repeatMode, setRepeatMode] = useState(0); // 0: off, 1: all, 2: one
   const [isShuffleOn, setIsShuffleOn] = useState(false);
   const [showLyrics, setShowLyrics] = useState(false);
-  const [volume, setVolume] = useState(75);
-  const [currentTime, setCurrentTime] = useState(120);
-  const [duration, setDuration] = useState(225); // Example duration: 3:45
-  const [trackData, setTrackData] = useState<any>(null);
+
   const [isJamming, setIsJamming] = useState(false);
   const [isQueueVisible, setIsQueueVisible] = useState(false);
   const [isEqVisible, setEqVisible] = useState(false);
 
-  useEffect(() => {
-    // Simulating fetching track data from a backend
-    const fetchTrackData = async () => {
-      // In a real app, you'd make an API call here
-      const mockData = {
-        title: 'Blinding Lights',
-        artist: 'The Weeknd',
-        album: 'After Hours',
-        albumArt:
-          'https://c.saavncdn.com/214/Teri-Baaton-Mein-Aisa-Uljha-Jiya-Hindi-2024-20240205151011-500x500.jpg',
-        lyrics: `
-        Bhigi Bhigi Raaton Men, Mithi Mithi Baaton Men
-        Aisi Barasaato Men, Kaisaa Lagataa Hai?
-        Lataa: [Aisaa Lagataa Hai Tum Banake Baadal,
-        Mere Badan Ko Bhigoke Mujhe, Chhed Rahe Ho O
-        Chhed Rahe Ho ] - 2`,
-      };
-      setTrackData(mockData as any);
-      setDuration(122);
-      setCurrentTime(122);
-    };
-    console.log(volume);
+  const [audioState] = useAudio();
 
-    fetchTrackData();
-  }, []);
-
-  const togglePlayPause = () => setIsPlaying(!isPlaying);
+  const togglePlayPause = () => {
+    if (audioState.playbackState === 'playing') {
+      audio.pause();
+    } else {
+      audio.play();
+    }
+  };
   const toggleFavorite = () => setIsFavorite(!isFavorite);
   const toggleRepeat = () => setRepeatMode((prevMode) => (prevMode + 1) % 3);
   const toggleShuffle = () => setIsShuffleOn(!isShuffleOn);
   const toggleLyrics = () => setShowLyrics(!showLyrics);
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  const onNext = () => {
+    audio.playNext();
+  };
+  const onPrevious = () => {
+    audio.playPrevious();
   };
 
   return (
@@ -107,11 +87,13 @@ const PlayerScreen = () => {
           } transition-all duration-400 ease-in-out flex flex-col items-center`}>
           <div
             className={`my-4 transition-transform duration-300 ease-in-out transform shadow-2xl ${
-              isPlaying ? 'scale-1' : ' scale-[80%]'
+              audioState.playbackState === 'playing' ? 'scale-1' : ' scale-[80%]'
             }`}>
             <Figure
               src={[
-                'https://c.saavncdn.com/214/Teri-Baaton-Mein-Aisa-Uljha-Jiya-Hindi-2024-20240205151011-500x500.jpg',
+                audioState.currentTrack.artwork
+                  ? audioState.currentTrack.artwork[0].src
+                  : '',
               ]}
               size='full'
               radius='md'
@@ -122,13 +104,14 @@ const PlayerScreen = () => {
           </div>
           <div className='flex items-start justify-between w-full text-start'>
             <div className='w-[85%]'>
-              <Marquee speed={0.4}>
-                <TextLink size={showLyrics ? 'sm' : 'xl'} weight='bold'>
-                  {trackData?.title || 'Song Title'}
-                </TextLink>
-              </Marquee>
-              <TextLink size={showLyrics ? 'xs' : 'md'} color='light' lineCount={2}>
-                {trackData?.artist || 'Artist Name'}
+              <TextLink size={showLyrics ? 'sm' : 'xl'} weight='bold'>
+                {audioState.currentTrack.title}
+              </TextLink>
+              <TextLink size={showLyrics ? 'xs' : 'md'} color='light' lineCount={1}>
+                {audioState.currentTrack.album}
+              </TextLink>
+              <TextLink size={showLyrics ? 'xs' : 'sm'} color='tertiary' lineCount={1}>
+                {audioState.currentTrack.artist}
               </TextLink>
             </div>
             <div className={showLyrics ? 'hidden' : 'flex flex-col'}>
@@ -159,7 +142,7 @@ const PlayerScreen = () => {
               Lyrics
             </TextLink>
             <TextLink size='sm' classNames='whitespace-pre-line' lineCount='none'>
-              {trackData?.lyrics || 'Lyrics not available'}
+              Lyrics not available
             </TextLink>
           </div>
         )}
@@ -170,19 +153,19 @@ const PlayerScreen = () => {
         <div className='relative'>
           <div className='flex items-center justify-between mb-2'>
             <Slider
-              max={100}
+              max={Number(audioState.currentTrack.duration)}
               min={0}
-              value={[50]}
-              step={1}
-              onChange={(val: number) => {
-                setVolume(val);
+              value={[Number(audioState.progress)]}
+              step={0.1}
+              onChange={(val) => {
+                audio.seek(val);
               }}
               label='volume'
             />
           </div>
           <div className='flex justify-between mt-2 text-xs text-text-primary'>
-            <span>{formatTime(currentTime)}</span>
-            <span>{formatTime(duration)}</span>
+            <span>{timeToReadable(Number(audioState.progress))}</span>
+            <span>{timeToReadable(Number(audioState.currentTrack.duration))}</span>
           </div>
         </div>
       </div>
@@ -199,20 +182,24 @@ const PlayerScreen = () => {
         <Button
           classNames='transition-transform text-text-primary active:scale-90'
           variant='unstyled'
-          onClick={() => {}}>
+          onClick={onPrevious}>
           <RiSkipBackFill size={36} />
         </Button>
         <Button
           variant='unstyled'
           onClick={togglePlayPause}
           classNames={`p-3 m-0  bg-surface text-text-primary transition-all duration-100 active:scale-90 
-          ${isPlaying ? 'rounded-xl' : 'rounded-full'}`}>
-          {isPlaying ? <RiPauseMiniFill size={56} /> : <RiPlayMiniFill size={56} />}
+          ${audioState.playbackState === 'playing' ? 'rounded-xl' : 'rounded-full'}`}>
+          {audioState.playbackState === 'playing' ? (
+            <RiPauseMiniFill size={56} />
+          ) : (
+            <RiPlayMiniFill size={56} />
+          )}
         </Button>
         <Button
           classNames='transition-transform text-text-primary active:scale-90'
           variant='unstyled'
-          onClick={() => {}}>
+          onClick={onNext}>
           <RiSkipForwardFill size={36} />
         </Button>
         <button

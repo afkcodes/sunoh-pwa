@@ -1,3 +1,4 @@
+import { PlayBackState } from 'audio_x';
 import { VariantProps } from 'class-variance-authority';
 import { Dispatch, SetStateAction } from 'react';
 import { type buttonStyles } from '../components/Button/button.styles';
@@ -108,12 +109,13 @@ export interface Song {
 export interface AudioItemProps {
   data: any;
   config: any;
-  onClick: () => void;
-  onOptionsClick: () => void;
+  onClick: (item: any) => void;
+  onOptionsClick: (item: any) => void;
   type: 'indexed' | 'thumbnail';
   currentProgress: number;
   index: number;
-  isPlaying: boolean;
+  playbackState: PlayBackState;
+  currentTrackId: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -128,7 +130,7 @@ export interface TileContainerProps {
   layout?: 'scrollList' | 'grid';
 }
 
-export type AudioItemConfig = Pick<AudioItemProps, 'type' | 'onClick' | 'onOptionsClick'>;
+export type AudioItemConfig = Pick<AudioItemProps, 'type'>;
 export interface AudioItemContainerProps {
   data: any;
   config: any;

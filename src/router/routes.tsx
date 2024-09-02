@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import BottomSheet from '~components/BottomSheet/BottomSheet';
 import PlayerScreen from '~components/Player/Player';
+import PlaylistScreen from '~pages/Playlist';
 
 const Home = lazy(() => import('~pages/Home'));
 const Search = lazy(() => import('~pages/Search'));
@@ -37,6 +38,14 @@ const routes = [
     element: (
       <Suspense fallback={<div>loading</div>}>
         <AlbumScreen />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/playlist/:playlistId',
+    element: (
+      <Suspense fallback={<div>loading</div>}>
+        <PlaylistScreen />
       </Suspense>
     ),
   },

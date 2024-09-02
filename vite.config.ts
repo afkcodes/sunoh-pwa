@@ -56,6 +56,7 @@ export default defineConfig({
         short_name: 'sunoh',
         description: 'music app',
         theme_color: '#0a0a0a',
+        start_url: '/',
       },
 
       injectManifest: {

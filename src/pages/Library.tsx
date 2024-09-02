@@ -1,7 +1,5 @@
-import Artist from './Artist';
-
 const Library = () => {
-  return <Artist />;
+  return <div>Library</div>;
 };
 
 export default Library;

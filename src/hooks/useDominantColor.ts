@@ -7,6 +7,7 @@ interface UseDominantColorPaletteResult {
   palette: HexColor[];
   isLoading: boolean;
   error: string | null;
+  textColor: string | null;
 }
 
 function useDominantColorPalette(
@@ -16,6 +17,7 @@ function useDominantColorPalette(
   const [palette, setPalette] = useState<HexColor[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [textColor, setTextColor] = useState<string | null>(null);
 
   useEffect(() => {
     setIsLoading(true);
@@ -25,9 +27,10 @@ function useDominantColorPalette(
       `https://proxy.ashish-kmr.workers.dev/?url=${imageUrl}`,
       paletteSize
     )
-      .then((colors) => {
-        setPalette(colors);
+      .then(({ dominantColors, textColor }) => {
+        setPalette(dominantColors);
         setIsLoading(false);
+        setTextColor(textColor);
       })
       .catch((err: Error) => {
         setError(err.message);
@@ -35,7 +38,7 @@ function useDominantColorPalette(
       });
   }, [imageUrl, paletteSize]);
 
-  return { palette, isLoading, error };
+  return { palette, isLoading, error, textColor };
 }
 
 export default useDominantColorPalette;
