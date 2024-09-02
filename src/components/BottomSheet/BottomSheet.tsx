@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Drawer } from 'vaul';
 import { sheetStackHandler } from '~helper/utils';
 
@@ -17,34 +17,41 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
   name,
   dismissible = true,
 }) => {
+  const handleClose = useCallback(() => {
+    const topSheet = sheetStackHandler.getTopSheet();
+    if (topSheet && topSheet.id === name) {
+      sheetStackHandler.remove(topSheet);
+      if (onClose) {
+        onClose();
+      }
+    }
+  }, [name, onClose]);
+
   useEffect(() => {
     if (isOpen) {
-      sheetStackHandler.add({ id: name, close: onClose as any });
-
-      const handlePopState = (event: any) => {
-        event.preventDefault();
-        const topSheet = sheetStackHandler.getTopSheet();
-        if (topSheet && topSheet.id === name && onClose) {
-          onClose();
-          sheetStackHandler.remove(topSheet);
-        }
-      };
-
+      sheetStackHandler.add({ id: name, close: handleClose });
       window.history.pushState(null, '', window.location.href);
-      window.addEventListener('popstate', handlePopState);
-      return () => {
-        window.removeEventListener('popstate', handlePopState);
-      };
     }
-  }, [isOpen]);
+  }, [isOpen, name, handleClose]);
+
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      event.preventDefault();
+      handleClose();
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [handleClose]);
 
   return (
     <Drawer.Root
       open={isOpen}
-      onClose={onClose}
-      onOpenChange={(d) => {
-        if (!d && onClose) {
-          onClose();
+      onOpenChange={(isOpen) => {
+        if (!isOpen) {
+          handleClose();
         }
       }}
       dismissible={dismissible}>
