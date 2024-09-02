@@ -9,8 +9,8 @@ const MOTION_VARIANTS: Variants = {
     boxShadow: direction < 0 ? '0 25px 50px -12px rgba(0, 0, 0, 0.5)' : 'none',
     transition: {
       type: 'tween',
-      delay: 1,
-      duration: 500,
+      delay: -0.2,
+      duration: 0.4,
       when: 'afterChildren',
     },
   }),
@@ -29,8 +29,8 @@ const MOTION_VARIANTS: Variants = {
     opacity: 0.2,
     transition: {
       type: 'tween',
-      delay: 0.45,
-      duration: 1,
+      delay: -0.45,
+      duration: 0.4,
     },
   }),
 };
@@ -48,7 +48,7 @@ const LayoutContainer = () => {
         animate='in'
         exit='out'
         custom={{ direction }}
-        className='w-full min-h-screen pb-20 view-transition-container'>
+        className='w-full min-h-screen pb-20 view-transition-container '>
         <Outlet />
       </motion.div>
       <BottomNavContainer />

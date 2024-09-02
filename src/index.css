@@ -126,7 +126,7 @@ body {
   z-index: 1;
 }
 
-@media screen and (max-width: 1024px) {
+/* @media screen and (max-width: 1024px) {
   ::view-transition-new(main-content),
   ::view-transition-old(main-content) {
     animation-duration: 400ms;
@@ -164,7 +164,7 @@ body {
   .reload-transition::view-transition-old(main-content) {
     animation-name: fade-out;
   }
-}
+} */
 
 /* ::view-transition-image-pair(main-content) {
     perspective: 10000px;
@@ -191,7 +191,7 @@ body {
   }
 } */
 
-/* @media screen and (max-width: 1024px) {
+@media screen and (max-width: 1024px) {
   ::view-transition-new(main-content),
   ::view-transition-old(main-content) {
     animation-duration: 350ms;
@@ -201,22 +201,27 @@ body {
 
   ::view-transition-old(main-content) {
     animation-name: android-slide-out;
+    opacity: 0;
   }
 
   ::view-transition-new(main-content) {
     animation-name: android-slide-in;
     mix-blend-mode: normal;
     z-index: 1;
+    opacity: 0;
   }
 
   .back-transition::view-transition-new(main-content) {
     animation-name: android-slide-out-reverse;
+    z-index: 1;
+    opacity: 1;
   }
 
   .back-transition::view-transition-old(main-content) {
     animation-name: android-slide-in-reverse;
     mix-blend-mode: normal;
     z-index: 1;
+    opacity: 0;
   }
 
   .reload-transition::view-transition-new(main-content) {
@@ -227,7 +232,61 @@ body {
   .reload-transition::view-transition-old(main-content) {
     animation-name: fade-out;
   }
-} */
+}
+
+@keyframes android-slide-out {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes android-slide-out-reverse {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes android-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes android-slide-in-reverse {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
 
 /* @keyframes android-slide-out {
   from {
@@ -382,4 +441,10 @@ body {
   to {
     opacity: 0;
   }
+}
+
+#root {
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
 }
