@@ -18,7 +18,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ isOpen, onClose, children }) 
       }}>
       <Drawer.Portal>
         <Drawer.Overlay className='fixed inset-0 bg-black/40' />
-        <Drawer.Content className='fixed bottom-0 left-0 right-0 z-50 overflow-hidden rounded-t-sm'>
+        <Drawer.Content className='fixed bottom-0 left-0 right-0 z-50 overflow-hidden border-none rounded-t-sm outline-none'>
           {children}
         </Drawer.Content>
       </Drawer.Portal>

@@ -45,7 +45,7 @@ export interface ImageProps {
 
 // Figure types
 export interface FigureProps extends VariantProps<typeof figureStyles> {
-  src: string;
+  src: string[];
   alt: string;
   fit: FitStrategy;
   position?: ObjectPosition;

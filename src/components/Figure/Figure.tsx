@@ -17,12 +17,13 @@ const Figure: React.FC<FigureProps> = ({
 }) => {
   const className = merge(figureStyles({ radius, size }), 'aspect-square');
   const [loadStatus, setLoadStatus] = useState<SetStateAction<ImageStatus>>('LOADING');
+  const sourceImages: string | string[] = mode === 'multi' ? src : src[0];
 
   return (
     <figure className={className} tabIndex={0} style={{ backgroundColor: dominantColor }}>
       {mode === 'single' ? (
         <Image
-          src={src}
+          src={sourceImages as string}
           alt={alt}
           loading={loading}
           fit={fit}
@@ -30,21 +31,39 @@ const Figure: React.FC<FigureProps> = ({
           position={position}
         />
       ) : (
-        <div className='flex flex-wrap w-full h-full overflow-hidden '>
-          {[1, 2, 3, 4].map((item) => {
-            return (
-              <div key={item} className='w-1/2 h-1/2'>
-                <Image
-                  src={src}
-                  alt={alt}
-                  loading={loading}
-                  fit={fit}
-                  setLoadStatus={setLoadStatus}
-                  position={position}
-                />
-              </div>
-            );
-          })}
+        <div
+          className='grid w-full h-full grid-cols-6 grid-rows-6 gap-1 p-2 overflow-hidden bg-surface'
+          style={{
+            gridTemplateAreas: `
+            "img1 img1 img2 img2 img2 img2" 
+            "img1 img1 img2 img2 img2 img2"
+            "img1 img1 img2 img2 img2 img2"
+            "img3 img3 img3 img3 img4 img4"
+            "img3 img3 img3 img3 img4 img4"
+            "img3 img3 img3 img3 img4 img4"
+            "img3 img3 img3 img3 img4 img4"
+        `,
+          }}>
+          {Array.isArray(sourceImages) &&
+            sourceImages.map((item, index) => {
+              return (
+                <div
+                  key={item}
+                  className='overflow-hidden rounded-xxxs'
+                  style={{
+                    gridArea: `img${index + 1}`,
+                  }}>
+                  <Image
+                    src={item}
+                    alt={alt}
+                    loading={loading}
+                    fit={fit}
+                    setLoadStatus={setLoadStatus}
+                    position={position}
+                  />
+                </div>
+              );
+            })}
         </div>
       )}
 

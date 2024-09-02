@@ -14,7 +14,7 @@ const Tile: React.FC<TileProps> = ({
 }) => {
   const title = dataExtractor(data, config.title);
   const subtitle = dataExtractor(data, config.subtitle);
-  const src = dataExtractor(data, config.image);
+  const images = dataExtractor(data, config.image);
   const alt = `${title}_poster`;
 
   return (
@@ -22,7 +22,7 @@ const Tile: React.FC<TileProps> = ({
       variant='unstyled'
       classNames='z-0 flex flex-col items-start transition-all duration-300 active:scale-95 p-0 m-0'
       onClick={onClick}>
-      <Figure {...figureConfig} src={src} alt={alt} />
+      <Figure {...figureConfig} src={images} alt={alt} />
       <div className='py-0.5 flex flex-col items-start'>
         <TextLink {...titleConfig}>{title}</TextLink>
         <TextLink {...subTitleConfig}>{subtitle}</TextLink>

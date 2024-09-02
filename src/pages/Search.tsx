@@ -1,13 +1,10 @@
 import { RiSearch2Line } from 'react-icons/ri';
 import Input from '~components/Input/Input';
-import PlayerScreen from '~components/Player/Player';
 import Tile from '~components/Tile/Tile';
-import { useBottomSheet } from '~contexts/BottomSheetContext';
 import useViewTransition from '~hooks/useViewTransition';
 
 const Search = () => {
   const navigate = useViewTransition();
-  const { openSheet } = useBottomSheet();
 
   return (
     <div className='w-full px-2 py-2'>
@@ -20,24 +17,8 @@ const Search = () => {
         {[1, 2, 3, 4, 8, 5, 6].map((item, idx) => (
           <div className={`${idx % 2 !== 0 ? 'justify-self-end' : ''}`}>
             <Tile
-              onLongPress={() => {
-                openSheet({
-                  isOpen: true,
-
-                  children: (
-                    <div className='text-black bg-white h-96'>
-                      <p>Hello modal</p>
-                    </div>
-                  ),
-                });
-              }}
               onClick={() => {
-                // navigate('/library');
-                openSheet({
-                  isOpen: true,
-
-                  children: <PlayerScreen />,
-                });
+                navigate('/library');
               }}
               key={item}
               figureConfig={{
@@ -56,8 +37,9 @@ const Search = () => {
                 size: 'xs',
               }}
               data={{
-                image:
+                image: [
                   'https://dx35vtwkllhj9.cloudfront.net/universalstudios/despicable-me-4/images/gallery/image6.jpg',
+                ],
                 title: 'Big Hero 6',
                 subtitle: 'Baymax',
               }}

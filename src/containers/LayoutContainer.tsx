@@ -1,5 +1,6 @@
 import { m, Variants } from 'framer-motion';
 import { Outlet, useLocation, useNavigationType } from 'react-router-dom';
+import MiniPlayer from '~components/MiniPlayer/MiniPlayer';
 import BottomNavContainer from './BottomNavContainer';
 
 const MOTION_VARIANTS: Variants = {
@@ -40,7 +41,7 @@ const LayoutContainer = () => {
   const type = useNavigationType();
   const direction = type === 'POP' ? -1 : 1;
   return (
-    <m.div className='min-h-screen bg-background text-text-primary'>
+    <m.div className='bg-background text-text-primary'>
       <m.div
         key={location.pathname}
         variants={MOTION_VARIANTS}
@@ -48,9 +49,10 @@ const LayoutContainer = () => {
         animate='in'
         exit='out'
         custom={{ direction }}
-        className='w-full min-h-screen pb-20 view-transition-container '>
+        className='w-full min-h-screen pb-36 view-transition-container '>
         <Outlet />
       </m.div>
+      <MiniPlayer />
       <BottomNavContainer />
     </m.div>
   );
