@@ -196,7 +196,7 @@ const PlaylistScreen = () => {
             </div>
 
             <div className='space-y-4'>
-              {playlistData.sections.map((section: any, idx: number) => {
+              {playlistData?.sections?.map((section: any, idx: number) => {
                 return (
                   <Section
                     key={idx}
