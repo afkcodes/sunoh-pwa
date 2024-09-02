@@ -6,6 +6,7 @@ const endpoints = {
     modules: `${baseURL}/modules`,
     album: `${baseURL}/saavn/album`,
     playlist: `${baseURL}/saavn/playlist`,
+    mix: `${baseURL}/saavn/mix`,
   },
 };
 

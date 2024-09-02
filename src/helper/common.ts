@@ -1,4 +1,5 @@
 import { MediaTrack } from 'audio_x';
+import { Track } from '~states/audioStore';
 
 export const isValidFunction = (fun: any) => typeof fun === 'function';
 export const isValidArray = (arr: any[]) => arr && Array.isArray(arr) && arr.length > 0;
@@ -228,7 +229,7 @@ interface Artist {
   image: Array<{ quality: string; link: string }>;
   type: string;
 }
-type MediaQuality = '12kbps' | '48kbps' | '96kbps' | '160kbps' | '320kbps';
+export type MediaQuality = '12kbps' | '48kbps' | '96kbps' | '160kbps' | '320kbps';
 
 export const createMediaTrack = (data: any, mediaQuality: MediaQuality): MediaTrack => {
   // Find the media URL with the specified quality
@@ -242,7 +243,7 @@ export const createMediaTrack = (data: any, mediaQuality: MediaQuality): MediaTr
   // ].join(', ');
 
   // Convert to MediaTrack format
-  const track: MediaTrack = {
+  const track: Track = {
     id: data.id,
     artwork: [
       {
@@ -269,6 +270,8 @@ export const createMediaTrack = (data: any, mediaQuality: MediaQuality): MediaTr
     duration: parseInt(data.duration),
     genre: '', // Assuming genre is not provided in the given data
     year: parseInt(data.year),
+    palette:
+      data?.palette?.map((color: any) => rgbToHex(color[0], color[1], color[2])) || '',
   };
 
   return track;
@@ -319,4 +322,57 @@ export function timeToReadable(seconds: number) {
 
 export function getNonEmptyStringData(data: string) {
   return data && data?.length > 0 ? data : null;
+}
+
+export function throttle<T extends (...args: any[]) => void>(func: T, delay: number): T {
+  let lastCall = 0;
+
+  return function (this: any, ...args: Parameters<T>) {
+    const now = Date.now();
+    if (now - lastCall >= delay) {
+      lastCall = now;
+      func.apply(this, args);
+    }
+  } as T;
+}
+
+export function rgbToHex(r: number, g: number, b: number): string {
+  return (
+    '#' +
+    [r, g, b]
+      .map((x) => {
+        const hex = x.toString(16);
+        return hex.length === 1 ? '0' + hex : hex;
+      })
+      .join('')
+  );
+}
+
+export function updateStatusBarColor(color: string) {
+  // Update theme-color meta tag
+  let metaThemeColor = document.querySelector('meta[name=theme-color]');
+  if (!metaThemeColor) {
+    metaThemeColor = document.createElement('meta');
+    metaThemeColor.setAttribute('name', 'theme-color');
+    document.head.appendChild(metaThemeColor);
+  }
+  metaThemeColor.setAttribute('content', color);
+
+  // If the app is running in standalone mode (installed PWA)
+  if (isValidWindow) {
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      // For Android
+      if (navigator.userAgent.toLowerCase().includes('android')) {
+        // @ts-ignore: Typescript might not recognize this API
+        if (window.NavigationBar) {
+          // @ts-ignore
+          window.NavigationBar.setColor(color);
+        }
+      }
+      // For iOS
+      if (navigator.userAgent.toLowerCase().includes('iphone')) {
+        document.documentElement.style.setProperty('--pwa-status-bar-color', color);
+      }
+    }
+  }
 }

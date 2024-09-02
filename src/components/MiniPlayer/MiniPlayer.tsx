@@ -13,6 +13,7 @@ import Button from '~components/Button/Button';
 import Figure from '~components/Figure/Figure';
 import PlayerScreen from '~components/Player/Player';
 import TextLink from '~components/TextLink/TextLink';
+import { getColorWithOpacity } from '~helper/common';
 import { audio, useAudio } from '~states/audioStore';
 
 const MiniPlayer = () => {
@@ -24,11 +25,16 @@ const MiniPlayer = () => {
   const isPlaying = audioState.playbackState === 'playing';
 
   const onPlayOrPause = () => {
-    audioState.playbackState === 'playing' ? audio.pause() : audio.play();
+    isPlaying ? audio.pause() : audio.play();
   };
 
-  return (
+  const color = audioState?.currentTrack?.palette?.[0] || '#';
+
+  return audioState.currentTrack.source ? (
     <motion.div
+      style={{
+        backgroundColor: getColorWithOpacity(color, 0.4),
+      }}
       initial={{ y: 100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 100 }}
@@ -116,7 +122,7 @@ const MiniPlayer = () => {
         <PlayerScreen />
       </BottomSheet>
     </motion.div>
-  );
+  ) : null;
 };
 
 export default MiniPlayer;

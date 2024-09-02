@@ -1,4 +1,3 @@
-import { AudioX } from 'audio_x';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import {
@@ -17,12 +16,11 @@ import TextLink from '~components/TextLink/TextLink';
 import { dataConfigs } from '~configs/data.config';
 import AudioItemContainer from '~containers/AudioItemContainer';
 import AudioStateContainer from '~containers/AudioStateContainer';
-import { createMediaTrack } from '~helper/common';
+import { mediaActions } from '~helper/mediaActions';
 import useFetch from '~hooks/useFetch';
 import useScrollToTop from '~hooks/useScrollToTop';
 import { endpoints } from '~network/endpoints';
 import http from '~network/http';
-import { audio, getAudioSnapshot, setAudioStore } from '~states/audioStore';
 
 const AlbumScreen: React.FC = () => {
   const { scrollY } = useScroll();
@@ -55,27 +53,12 @@ const AlbumScreen: React.FC = () => {
 
   useScrollToTop();
 
-  const audioInstance = AudioX.getAudioInstance();
-
   const onShuffle = () => {
-    const tracks = data?.list?.map((item: any) => createMediaTrack(item, '160kbps'));
-    audio.addQueue(tracks, 'SHUFFLE');
-    setAudioStore({ currentPlaybackSource: `${data.id}#shuffle` });
+    mediaActions.shuffle(data, '160kbps');
   };
 
   const onPlayAll = () => {
-    const queueLength = audio.getQueue().length;
-    if (!queueLength || data.id !== getAudioSnapshot().currentPlaybackSource) {
-      const tracks = data?.list?.map((item: any) => createMediaTrack(item, '160kbps'));
-      audio.addQueue(tracks, 'DEFAULT');
-      audio.addMediaAndPlay();
-      setAudioStore({ currentPlaybackSource: data.id });
-    }
-    if (audioInstance.paused) {
-      audio.play();
-    } else {
-      audio.pause();
-    }
+    mediaActions.playAll(data, '160kbps');
   };
 
   return (

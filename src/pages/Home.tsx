@@ -24,6 +24,9 @@ const Home = () => {
     if (category === 'playlist') {
       push(`/playlist/${token}`);
     }
+    if (category === 'mix') {
+      push(`/playlist/${token}?type=mix`);
+    }
   };
 
   return (

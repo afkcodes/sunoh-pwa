@@ -1,4 +1,3 @@
-import { AudioX } from 'audio_x';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import {
@@ -11,18 +10,18 @@ import {
 } from 'react-icons/lu';
 import { RiShareForwardLine } from 'react-icons/ri';
 import { useParams } from 'react-router';
+import { useSearchParams } from 'react-router-dom';
 import Button from '~components/Button/Button';
 import Figure from '~components/Figure/Figure';
 import TextLink from '~components/TextLink/TextLink';
 import { dataConfigs } from '~configs/data.config';
 import AudioItemContainer from '~containers/AudioItemContainer';
 import AudioStateContainer from '~containers/AudioStateContainer';
-import { createMediaTrack } from '~helper/common';
+import { mediaActions } from '~helper/mediaActions';
 import useFetch from '~hooks/useFetch';
 import useScrollToTop from '~hooks/useScrollToTop';
 import { endpoints } from '~network/endpoints';
 import http from '~network/http';
-import { audio, getAudioSnapshot, setAudioStore } from '~states/audioStore';
 
 const PlaylistScreen = () => {
   const containerRef = useRef(null);
@@ -48,31 +47,24 @@ const PlaylistScreen = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  let [searchParams] = useSearchParams();
+  const type = searchParams.get('type');
+  const url =
+    type === 'mix'
+      ? `${endpoints.saavn.mix}/${playlistId}`
+      : `${endpoints.saavn.playlist}/${playlistId}`;
+
   const { data, isLoading } = useFetch({
     queryKey: [`album_${playlistId}`],
-    queryFn: async () => await http(`${endpoints.saavn.playlist}/${playlistId}`),
+    queryFn: async () => await http(url),
   });
 
   const onShuffle = () => {
-    const tracks = data?.list?.map((item: any) => createMediaTrack(item, '160kbps'));
-    audio.addQueue(tracks, 'SHUFFLE');
-    setAudioStore({ currentPlaybackSource: `${data.id}#shuffle` });
+    mediaActions.shuffle(data);
   };
 
   const onPlayAll = () => {
-    const audioInstance = AudioX.getAudioInstance();
-    const queueLength = audio.getQueue().length;
-    if (!queueLength || data.id !== getAudioSnapshot().currentPlaybackSource) {
-      const tracks = data?.list?.map((item: any) => createMediaTrack(item, '160kbps'));
-      audio.addQueue(tracks, 'DEFAULT');
-      audio.addMediaAndPlay();
-      setAudioStore({ currentPlaybackSource: data.id });
-    }
-    if (audioInstance.paused) {
-      audio.play();
-    } else {
-      audio.pause();
-    }
+    mediaActions.playAll(data);
   };
 
   useScrollToTop();

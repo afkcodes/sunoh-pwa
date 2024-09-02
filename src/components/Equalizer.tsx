@@ -25,18 +25,13 @@ const Equalizer = () => {
   const [bassBoostActive, setBassBoostActive] = useState(false);
 
   const frequencies = ['32', '64', '125', '250', '500', '1k', '2k', '4k', '8k', '16k'];
-
   useEffect(() => {
-    // const savedPresets = localStorage.getItem('customPresets');
-
     const lastActivePreset = storage.getItem('current_preset');
     const currentPreset = JSON.parse(lastActivePreset || '{}');
     if (currentPreset?.id && currentPreset?.id !== activePreset.id) {
       setActivePreset(currentPreset);
       setLevels(currentPreset.gains);
-      // audio.setPreset(currentPreset.id as keyof Preset);
     }
-    console.log('called rendered');
   }, []);
 
   const handlePresetChange = (preset: Preset) => {

@@ -24,7 +24,7 @@ import Figure from '~components/Figure/Figure';
 import QueueList from '~components/QueueList';
 import Slider from '~components/Slider/Slider';
 import TextLink from '~components/TextLink/TextLink';
-import { timeToReadable } from '~helper/common';
+import { getColorWithOpacity, timeToReadable } from '~helper/common';
 import { audio, useAudio } from '~states/audioStore';
 
 const PlayerScreen = () => {
@@ -58,8 +58,15 @@ const PlayerScreen = () => {
     audio.playPrevious();
   };
 
+  const color = audioState?.currentTrack?.palette?.[0].toString() || '#';
+
   return (
-    <div className='relative flex flex-col min-h-screen transition-all duration-200 ease-in text-text-primary p-7 bg-gradient-to-b from-gray-900 to-black'>
+    <div
+      className='relative flex flex-col min-h-screen transition-all duration-200 ease-in text-text-primary p-7 bg-gradient-to-b from-gray-900 to-black'
+      style={{
+        background: `linear-gradient(180deg, 
+        ${getColorWithOpacity(color, 0.8)} 0%, rgba(0,0,0,1) 80%)`,
+      }}>
       {/* Top Bar */}
       <div className='flex items-center justify-between mb-4'>
         <Button
@@ -185,17 +192,20 @@ const PlayerScreen = () => {
           onClick={onPrevious}>
           <RiSkipBackFill size={36} />
         </Button>
+
         <Button
           variant='unstyled'
           onClick={togglePlayPause}
-          classNames={`p-3 m-0  bg-surface text-text-primary transition-all duration-100 active:scale-90 
-          ${audioState.playbackState === 'playing' ? 'rounded-xl' : 'rounded-full'}`}>
+          classNames={`p-0 m-0 h-full bg-surface  w-full text-text-primary p-3 m-0 transition-all duration-100 active:scale-90 backdrop-blur-sm
+             ${audioState.playbackState === 'playing' ? 'rounded-xl' : 'rounded-full'}
+            `}>
           {audioState.playbackState === 'playing' ? (
             <RiPauseMiniFill size={56} />
           ) : (
             <RiPlayMiniFill size={56} />
           )}
         </Button>
+
         <Button
           classNames='transition-transform text-text-primary active:scale-90'
           variant='unstyled'

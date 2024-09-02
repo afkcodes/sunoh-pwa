@@ -9,6 +9,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
   dismissible = true,
 }) => {
   const navigate = useNavigate();
+
   const handleClose = () => {
     if (onClose) {
       onClose();

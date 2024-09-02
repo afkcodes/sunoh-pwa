@@ -52,7 +52,7 @@ const useHistory = (rootPath = '/') => {
       if (!shouldAllowAction()) return;
 
       try {
-        console.log('Pushing new path:', path);
+        // console.log('Pushing new path:', path);
         isInternalNavigation.current = true;
         setStack((prevStack) => [...prevStack.slice(0, currentIndex + 1), path]);
         setCurrentIndex((prevIndex) => prevIndex + 1);
@@ -74,13 +74,13 @@ const useHistory = (rootPath = '/') => {
     try {
       if (currentIndex > 0) {
         const newIndex = currentIndex - 1;
-        console.log('Going back. New index:', newIndex);
+        // console.log('Going back. New index:', newIndex);
         isInternalNavigation.current = true;
         setCurrentIndex(newIndex);
         setIsPush(false);
         navigate(stack[newIndex]);
       } else {
-        console.log('Cannot go back: already at the beginning of the stack');
+        // console.log('Cannot go back: already at the beginning of the stack');
       }
     } catch (error) {
       console.error('Error in back:', error);
@@ -96,16 +96,16 @@ const useHistory = (rootPath = '/') => {
     try {
       if (currentIndex < stack.length - 1) {
         const newIndex = currentIndex + 1;
-        console.log('Going forward. New index:', newIndex);
+        // console.log('Going forward. New index:', newIndex);
         isInternalNavigation.current = true;
         setIsPush(true);
         setCurrentIndex(newIndex);
         navigate(stack[newIndex]);
       } else {
-        console.log('Cannot go forward: already at the end of the stack');
+        // console.log('Cannot go forward: already at the end of the stack');
       }
     } catch (error) {
-      console.error('Error in forward:', error);
+      // console.error('Error in forward:', error);
     }
   }, [currentIndex, navigate, stack, shouldAllowAction]);
 
@@ -116,14 +116,14 @@ const useHistory = (rootPath = '/') => {
     if (!shouldAllowAction()) return;
 
     try {
-      console.log('Resetting history to root path');
+      // console.log('Resetting history to root path');
       isInternalNavigation.current = true;
       setStack([rootPath]);
       setCurrentIndex(0);
       setIsPush(true);
       navigate(rootPath, { replace: true });
     } catch (error) {
-      console.error('Error in reset:', error);
+      // console.error('Error in reset:', error);
     }
   }, [navigate, rootPath, shouldAllowAction]);
 
@@ -134,15 +134,15 @@ const useHistory = (rootPath = '/') => {
         const currentPath = location.pathname;
         const stackIndex = stack.indexOf(currentPath);
         if (stackIndex === -1) {
-          console.log('New external path detected:', currentPath);
+          // console.log('New external path detected:', currentPath);
           setStack((prevStack) => [...prevStack.slice(0, currentIndex + 1), currentPath]);
           setCurrentIndex((prevIndex) => prevIndex + 1);
         } else {
-          console.log('Existing path in stack detected:', currentPath);
+          // console.log('Existing path in stack detected:', currentPath);
           setCurrentIndex(stackIndex);
         }
       } catch (error) {
-        console.error('Error handling external navigation:', error);
+        // console.error('Error handling external navigation:', error);
       }
     }
     isInternalNavigation.current = false;
@@ -152,12 +152,12 @@ const useHistory = (rootPath = '/') => {
   useEffect(() => {
     if (currentIndex === 0 && stack.length > 1) {
       try {
-        console.log('Reached the root route. Clearing browser stack.');
+        // console.log('Reached the root route. Clearing browser stack.');
         isInternalNavigation.current = true;
         setStack([stack[0]]);
         navigate(stack[0], { replace: true });
       } catch (error) {
-        console.error('Error clearing browser stack:', error);
+        // console.error('Error clearing browser stack:', error);
       }
     }
   }, [currentIndex, navigate, stack]);
@@ -168,9 +168,9 @@ const useHistory = (rootPath = '/') => {
   const isLastRoute = stack.length === 1 && currentIndex === 0;
 
   // Debug logging
-  console.log('Current stack:', stack);
-  console.log('Current index:', currentIndex);
-  console.log('Is last route:', isLastRoute);
+  // console.log('Current stack:', stack);
+  // console.log('Current index:', currentIndex);
+  // console.log('Is last route:', isLastRoute);
 
   return {
     push,

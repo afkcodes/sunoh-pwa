@@ -15,6 +15,7 @@ const dataConfigs = {
     image: 'images.1.link',
     duration: 'duration',
     artist: 'artist',
+    palette: 'palette',
   },
 };
 

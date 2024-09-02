@@ -24,13 +24,24 @@ const AudioItem: React.FC<AudioItemProps> = ({
     dataExtractor(data, config.artist);
   const image = dataExtractor(data, config.image) as string;
   const duration = Number(dataExtractor(data, config.duration) || 0);
+  // const palette = dataExtractor(data, dataConfigs.audio.palette);
+
+  const onAudioItemClick = (data: any) => {
+    // setAudioStoreTransient({
+    //   currentTrack: {
+    //     ...getAudioSnapshot().currentTrack,
+    //     palette,
+    //   },
+    // });
+    onClick(data);
+  };
 
   return (
     <div
       role='button'
       className='relative flex w-full py-2 m-0 overflow-hidden rounded-sm bg-surface/50 items-between'
       onClick={() => {
-        onClick(data);
+        onAudioItemClick(data);
       }}>
       <div className='absolute inset-0 '></div>
       <motion.div
