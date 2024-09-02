@@ -10,7 +10,7 @@ const Library = () => {
         {[1, 2, 3, 4, 8, 5, 6, 55, 6, 77, 88, 888, 8888, 12].map((item) => (
           <Tile
             onClick={() => {
-              navigate('/');
+              navigate('/home');
             }}
             key={item}
             figureConfig={{
