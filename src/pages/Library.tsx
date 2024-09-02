@@ -16,7 +16,7 @@ const Library = () => {
             figureConfig={{
               fit: 'cover',
               radius: 'xxxs',
-              size: 'xl',
+              size: 'xxl',
             }}
             titleConfig={{
               color: 'primary',

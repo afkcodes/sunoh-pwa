@@ -1,4 +1,4 @@
-import { motion, Variants } from 'framer-motion';
+import { m, Variants } from 'framer-motion';
 import { Outlet, useLocation, useNavigationType } from 'react-router-dom';
 import BottomNavContainer from './BottomNavContainer';
 
@@ -9,7 +9,7 @@ const MOTION_VARIANTS: Variants = {
     boxShadow: direction < 0 ? '0 25px 50px -12px rgba(0, 0, 0, 0.5)' : 'none',
     transition: {
       type: 'tween',
-      delay: -0.2,
+      delay: 1.5,
       duration: 0.4,
       when: 'afterChildren',
     },
@@ -20,8 +20,8 @@ const MOTION_VARIANTS: Variants = {
     scale: 1,
     transition: {
       type: 'tween',
-      delay: -0.15,
-      duration: 0.45,
+      delay: -0.1,
+      duration: 0.4,
     },
   },
   out: ({ direction }: { direction: number }) => ({
@@ -40,8 +40,8 @@ const LayoutContainer = () => {
   const type = useNavigationType();
   const direction = type === 'POP' ? -1 : 1;
   return (
-    <motion.div className='bg-background text-text-primary'>
-      <motion.div
+    <m.div className='min-h-screen bg-background text-text-primary'>
+      <m.div
         key={location.pathname}
         variants={MOTION_VARIANTS}
         initial={direction > 0 && 'initial'}
@@ -50,9 +50,9 @@ const LayoutContainer = () => {
         custom={{ direction }}
         className='w-full min-h-screen pb-20 view-transition-container '>
         <Outlet />
-      </motion.div>
+      </m.div>
       <BottomNavContainer />
-    </motion.div>
+    </m.div>
   );
 };
 

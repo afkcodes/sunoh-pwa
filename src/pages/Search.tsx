@@ -7,14 +7,14 @@ const Search = () => {
   const navigate = useViewTransition();
 
   return (
-    <>
-      <div className='sticky top-0 p-2'>
+    <div className='py-2'>
+      <div className='sticky top-0 z-20 px-2'>
         <Input
           placeholder='Hello Input'
           suffixIcon={<RiSearch2Line size={26} className='text-text-secondary' />}
         />
       </div>
-      <div className='py-2 bg-background'>
+      <div className=' bg-background'>
         <div className='z-0 grid items-center justify-center w-full grid-cols-2 justify-items-center'>
           {[1, 2, 3, 4, 8, 5, 6].map((item) => (
             <Tile
@@ -23,9 +23,9 @@ const Search = () => {
               }}
               key={item}
               figureConfig={{
-                fit: 'contain',
+                fit: 'cover',
                 radius: 'xxxs',
-                size: 'xl',
+                size: 'xxl',
               }}
               titleConfig={{
                 color: 'primary',
@@ -56,7 +56,7 @@ const Search = () => {
           aliquam doloremque accusantium vitae minima et tempore illo velit ex.
         </p>
       </div>
-    </>
+    </div>
   );
 };
 

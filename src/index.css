@@ -114,12 +114,6 @@ body {
   z-index: 2;
 }
 
-#root {
-  overflow-x: hidden;
-  min-height: 100vh;
-  width: 100%;
-}
-
 .view-transition-container {
   view-transition-name: main-content;
   position: relative;
@@ -194,7 +188,7 @@ body {
 @media screen and (max-width: 1024px) {
   ::view-transition-new(main-content),
   ::view-transition-old(main-content) {
-    animation-duration: 350ms;
+    animation-duration: 400ms;
     animation-timing-function: ease-out;
     animation-direction: normal;
   }
@@ -441,10 +435,4 @@ body {
   to {
     opacity: 0;
   }
-}
-
-#root {
-  overflow: hidden;
-  width: 100vw;
-  height: 100vh;
 }
