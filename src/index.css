@@ -1,0 +1,385 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Primary Colors */
+  --color-primary: 178, 34, 45; /* #B2222D - Keeping the existing primary color */
+  --color-primary-light: 204, 51, 64; /* #CC3340 - Lighter shade of primary */
+  --color-primary-dark: 153, 27, 37; /* #991B25 - Darker shade of primary */
+
+  /* Secondary Colors - Now a distinct teal */
+  --color-secondary: 0, 150, 136; /* #009688 - Teal */
+  --color-secondary-light: 38, 166, 154; /* #26A69A - Lighter teal */
+  --color-secondary-dark: 0, 121, 107; /* #00796B - Darker teal */
+
+  /* Tertiary Colors - Now a distinct purple */
+  --color-tertiary: 103, 58, 183; /* #673AB7 - Purple */
+  --color-tertiary-light: 126, 87, 194; /* #7E57C2 - Lighter purple */
+  --color-tertiary-dark: 81, 45, 168; /* #512DA8 - Darker purple */
+
+  /* Neutral Colors */
+  --color-background: 10, 10, 10; /* #0a0a0a - Dark background */
+  --color-surface: 30, 30, 30; /* #1E1E1E - Slightly lighter than background for cards, etc. */
+  --color-overlay: 40, 40, 40; /* #282828 - For overlays and modals */
+
+  /* Text Colors */
+  --color-text-primary: 255, 255, 255; /* #FFFFFF - Primary text */
+  --color-text-secondary: 185, 185, 185; /* #B9B9B9 - Secondary text */
+  --color-text-tertiary: 138, 138, 138; /* #8A8A8A - Tertiary text */
+  --color-text-disabled: 97, 97, 97; /* #616161 - Disabled text */
+
+  /* Accent Colors */
+  --color-accent-1: 255, 171, 0; /* #FFAB00 - Yellow accent */
+  --color-accent-2: 0, 149, 255; /* #0095FF - Blue accent */
+  --color-accent-3: 76, 175, 80; /* #4CAF50 - Green accent */
+
+  /* Semantic Colors */
+  --color-success: 76, 175, 80; /* #4CAF50 - Success green */
+  --color-warning: 255, 171, 0; /* #FFAB00 - Warning yellow */
+  --color-error: 244, 67, 54; /* #F44336 - Error red */
+  --color-info: 3, 169, 244; /* #03A9F4 - Info blue */
+
+  /* Button Colors */
+  --color-button-primary: 178, 34, 45; /* #B2222D - Primary button */
+  --color-button-primary-hover: 204, 51, 64; /* #CC3340 - Primary button hover */
+  --color-button-primary-active: 153, 27, 37; /* #991B25 - Primary button active */
+
+  --color-button-secondary: 0, 150, 136; /* #009688 - Secondary button */
+  --color-button-secondary-hover: 38, 166, 154; /* #26A69A - Secondary button hover */
+  --color-button-secondary-active: 0, 121, 107; /* #00796B - Secondary button active */
+
+  --color-button-tertiary: 103, 58, 183; /* #673AB7 - Tertiary button */
+  --color-button-tertiary-hover: 126, 87, 194; /* #7E57C2 - Tertiary button hover */
+  --color-button-tertiary-active: 81, 45, 168; /* #512DA8 - Tertiary button active */
+
+  --color-button-dark: 38, 38, 38; /* #262626 - Tertiary button */
+  --color-button-dark-hover: 55, 55, 55; /* #373737 - Tertiary button hover */
+  --color-button-dark-active: 30, 30, 30; /* #1E1E1E - Tertiary button active */
+
+  /* Border and Divider Colors */
+  --color-border: 66, 66, 66; /* #424242 - Border color */
+  --color-divider: 48, 48, 48; /* #303030 - Divider color */
+
+  /* Input Colors */
+  --color-input-background: 30, 30, 30; /* #1E1E1E - Input background */
+  --color-input-border: 66, 66, 66; /* #424242 - Input border */
+  --color-input-focus-border: 178, 34, 45; /* #B2222D - Input focus border (primary color) */
+
+  /* Navigation Colors */
+  --color-nav-background: 18, 18, 18; /* #121212 - Navigation background */
+  --color-nav-item: 255, 255, 255; /* #FFFFFF - Navigation item */
+  --color-nav-item-hover: 185, 185, 185; /* #B9B9B9 - Navigation item hover */
+  --color-nav-item-active: 178, 34, 45; /* #B2222D - Navigation item active (primary color) */
+
+  /* Card Colors */
+  --color-card-background: 30, 30, 30; /* #1E1E1E - Card background */
+  --color-card-border: 48, 48, 48; /* #303030 - Card border */
+  --color-card-hover: 40, 40, 40; /* #282828 - Card hover */
+
+  /* Link Colors */
+  --color-link: 178, 34, 45; /* #B2222D - Link color (primary color) */
+  --color-link-hover: 204, 51, 64; /* #CC3340 - Link hover color */
+  --color-link-active: 153, 27, 37; /* #991B25 - Link active color */
+
+  /* Icon Colors */
+  --color-icon-primary: 255, 255, 255; /* #FFFFFF - Primary icon color */
+  --color-icon-secondary: 185, 185, 185; /* #B9B9B9 - Secondary icon color */
+
+  --page-transition-animation-duration: 300ms;
+  --page-transition-animation-timing-function: cubic-bezier(0.465, 0.183, 0.153, 0.946);
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  font-family: 'Lexend', sans-serif;
+  overscroll-behavior: contain;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.bottom-nav-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  contain: layout;
+  view-transition-name: main-footer;
+  z-index: 2;
+}
+
+#root {
+  overflow-x: hidden;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.view-transition-container {
+  view-transition-name: main-content;
+  position: relative;
+  z-index: 1;
+}
+
+@media screen and (max-width: 1024px) {
+  ::view-transition-new(main-content),
+  ::view-transition-old(main-content) {
+    animation-duration: 400ms;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    animation-fill-mode: both;
+    z-index: 2;
+    animation-direction: normal;
+  }
+
+  ::view-transition-old(main-content) {
+    animation-name: slide-out;
+  }
+
+  ::view-transition-new(main-content) {
+    animation-name: slide-in;
+    mix-blend-mode: normal;
+  }
+
+  .back-transition::view-transition-new(main-content) {
+    animation-name: slide-out-reverse;
+    z-index: 1;
+  }
+
+  .back-transition::view-transition-old(main-content) {
+    animation-name: slide-in-reverse;
+    mix-blend-mode: normal;
+    z-index: 2;
+  }
+
+  .reload-transition::view-transition-new(main-content) {
+    animation-name: fade-in;
+    animation-duration: calc(2 * var(--page-transition-animation-duration));
+  }
+
+  .reload-transition::view-transition-old(main-content) {
+    animation-name: fade-out;
+  }
+}
+
+/* ::view-transition-image-pair(main-content) {
+    perspective: 10000px;
+  }
+
+  ::view-transition-old(main-content) {
+    animation-name: scale-out;
+    z-index: 1;
+  }
+
+  ::view-transition-new(main-content) {
+    animation-name: scale-in;
+  }
+
+  .back-transition::view-transition-new(main-content) {
+    animation-name: scale-out-reverse;
+    z-index: 1;
+  }
+
+  .back-transition::view-transition-old(main-content) {
+    animation-name: scale-in-reverse;
+    mix-blend-mode: normal;
+    z-index: 0;
+  }
+} */
+
+/* @media screen and (max-width: 1024px) {
+  ::view-transition-new(main-content),
+  ::view-transition-old(main-content) {
+    animation-duration: 350ms;
+    animation-timing-function: ease-out;
+    animation-direction: normal;
+  }
+
+  ::view-transition-old(main-content) {
+    animation-name: android-slide-out;
+  }
+
+  ::view-transition-new(main-content) {
+    animation-name: android-slide-in;
+    mix-blend-mode: normal;
+    z-index: 1;
+  }
+
+  .back-transition::view-transition-new(main-content) {
+    animation-name: android-slide-out-reverse;
+  }
+
+  .back-transition::view-transition-old(main-content) {
+    animation-name: android-slide-in-reverse;
+    mix-blend-mode: normal;
+    z-index: 1;
+  }
+
+  .reload-transition::view-transition-new(main-content) {
+    animation-name: fade-in;
+    animation-duration: calc(2 * var(--page-transition-animation-duration));
+  }
+
+  .reload-transition::view-transition-old(main-content) {
+    animation-name: fade-out;
+  }
+} */
+
+/* @keyframes android-slide-out {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes android-slide-out-reverse {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes android-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes android-slide-in-reverse {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+
+@keyframes scale-out {
+  from {
+    transform: translateZ(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateZ(5000px);
+    opacity: 0;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    transform: translateZ(-5000px);
+    opacity: 0;
+  }
+  to {
+    transform: translateZ(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scale-out-reverse {
+  from {
+    transform: translateZ(5000px);
+    opacity: 0;
+  }
+  to {
+    transform: translateZ(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scale-in-reverse {
+  from {
+    transform: translateZ(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateZ(-15000px);
+    opacity: 0;
+  }
+} */
+
+/* Slide */
+
+@keyframes slide-out {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-20%);
+  }
+}
+
+@keyframes slide-out-reverse {
+  from {
+    transform: translateX(-20%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-reverse {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
