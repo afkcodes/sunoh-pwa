@@ -5,7 +5,7 @@ const Library = () => {
   const navigate = useViewTransition();
 
   return (
-    <div className='bg-background'>
+    <div className='w-full px-2 py-2'>
       <div className='grid items-center justify-center w-full grid-cols-2 justify-items-center'>
         {[1, 2, 3, 4, 8, 5, 6, 55, 6, 77, 88, 888, 8888, 12].map((item) => (
           <Tile
@@ -30,10 +30,10 @@ const Library = () => {
             }}
             data={{
               image: [
-                'https://m.media-amazon.com/images/I/81OxUOV+7qL._AC_UF1000,1000_QL80_.jpg',
+                'https://ichef.bbci.co.uk/news/976/cpsprodpb/3bed/live/849864f0-295a-11ef-a13a-0b8c563da930.jpg',
               ],
-              title: 'Big Hero 6',
-              subtitle: 'Baymax',
+              title: 'Inside out 2',
+              subtitle: 'Joy',
             }}
             config={{
               image: 'image',
