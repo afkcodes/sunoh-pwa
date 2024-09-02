@@ -180,6 +180,7 @@ import {
   RiPlayMiniFill,
   RiRfidLine,
 } from 'react-icons/ri';
+import { Link, useLocation } from 'react-router-dom';
 import BottomSheet from '~components/BottomSheet/BottomSheet';
 import Button from '~components/Button/Button';
 import Figure from '~components/Figure/Figure';
@@ -192,6 +193,7 @@ const MiniPlayer = () => {
   const [isJamming, setIsJamming] = useState(false);
   const [isPlayerExpanded, setPlayerExpanded] = useState(false);
   const [progress, setProgress] = useState(50); // Current progress (0-100)
+  const location = useLocation();
 
   useEffect(() => {
     setProgress(75);
@@ -212,9 +214,10 @@ const MiniPlayer = () => {
           transition={{ duration: 1, ease: 'linear' }}
         />
 
-        <div
-          className='relative z-10 flex items-center justify-between h-16 px-4'
-          onClick={() => setPlayerExpanded(true)}>
+        <Link
+          to='player'
+          state={{ background: location }}
+          className='relative z-10 flex items-center justify-between h-16 px-4'>
           <div>
             <Figure
               src={[
@@ -268,7 +271,7 @@ const MiniPlayer = () => {
               {isPlaying ? <RiPauseMiniFill size={34} /> : <RiPlayMiniFill size={34} />}
             </Button>
           </div>
-        </div>
+        </Link>
       </div>
       <BottomSheet
         isOpen={isPlayerExpanded}

@@ -1,7 +1,7 @@
 import { m, Variants } from 'framer-motion';
-import { Outlet, useLocation } from 'react-router-dom';
-import MiniPlayer from '~components/MiniPlayer/MiniPlayer';
-import BottomNavContainer from './BottomNavContainer';
+// import { Outlet, useLocation } from 'react-router-dom';
+// import MiniPlayer from '~components/MiniPlayer/MiniPlayer';
+// import BottomNavContainer from './BottomNavContainer';
 
 const MOTION_VARIANTS: Variants = {
   initial: {
@@ -27,9 +27,12 @@ const MOTION_VARIANTS: Variants = {
   },
 };
 
-const LayoutContainer = () => {
-  const location = useLocation();
+import { Outlet, useLocation } from 'react-router-dom';
+import MiniPlayer from '~components/MiniPlayer/MiniPlayer';
+import BottomNavContainer from './BottomNavContainer';
 
+export const LayoutContainer = () => {
+  const location = useLocation();
   return (
     <div className='min-h-screen bg-background pb-36 text-text-primary'>
       <m.div
@@ -46,5 +49,3 @@ const LayoutContainer = () => {
     </div>
   );
 };
-
-export default LayoutContainer;

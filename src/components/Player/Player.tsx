@@ -25,7 +25,6 @@ import Marquee from '~components/Marquee/Marquee';
 import QueueList from '~components/QueueList';
 import Slider from '~components/Slider/Slider';
 import TextLink from '~components/TextLink/TextLink';
-import useDominantColorPalette from '~hooks/useDominantColor';
 
 const PlayerScreen = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -40,10 +39,6 @@ const PlayerScreen = () => {
   const [isJamming, setIsJamming] = useState(false);
   const [isQueueVisible, setIsQueueVisible] = useState(false);
   const [isEqVisible, setEqVisible] = useState(false);
-
-  const { palette } = useDominantColorPalette(
-    'https://c.saavncdn.com/214/Teri-Baaton-Mein-Aisa-Uljha-Jiya-Hindi-2024-20240205151011-500x500.jpg'
-  );
 
   useEffect(() => {
     // Simulating fetching track data from a backend
@@ -84,11 +79,7 @@ const PlayerScreen = () => {
   };
 
   return (
-    <div
-      className='relative flex flex-col min-h-screen transition-all duration-200 ease-in text-text-primary p-7 bg-gradient-to-b from-gray-900 to-black'
-      style={{
-        background: `linear-gradient(to bottom, ${palette[0]} , #000 80%)`,
-      }}>
+    <div className='relative flex flex-col min-h-screen transition-all duration-200 ease-in text-text-primary p-7 bg-gradient-to-b from-gray-900 to-black'>
       {/* Top Bar */}
       <div className='flex items-center justify-between mb-4'>
         <Button
