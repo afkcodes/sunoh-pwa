@@ -21,6 +21,7 @@ export default {
         xs: '0.75rem', // 10px
         sm: '0.875rem', // 12px
         base: '1rem', // 16px (default base font size)
+        md: '1.125rem', // 18px
         lg: '1.25rem', // 20px
         xl: '1.5rem', // 24px
         xxl: '2rem', // 32px
@@ -37,7 +38,7 @@ export default {
         xl: '1.5rem', // 24px
         xxl: '2rem', // 32px
         xxxl: '2.5rem', // 40px
-        full: '50%',
+        full: '99999rem',
       },
       colors: {
         primary: {

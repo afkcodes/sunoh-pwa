@@ -118,7 +118,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
       <Drawer.Portal>
         <Drawer.Overlay className='fixed inset-0 bg-black/40' />
         <Drawer.Content
-          className='fixed bottom-0 left-0 right-0 z-10 overflow-hidden border-none rounded-t-sm outline-none'
+          className='fixed bottom-0 left-0 right-0 z-10 overflow-hidden border-none outline-none'
           aria-describedby='modal content'>
           <Drawer.Title className='sr-only'>Bottom Sheet Content Main</Drawer.Title>
           <Drawer.Description className='sr-only'>

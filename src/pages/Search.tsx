@@ -44,7 +44,7 @@ const Search = () => {
                 subtitle: 'Baymax',
               }}
               config={{
-                image: 'image',
+                images: 'image.0',
                 title: 'title',
                 subtitle: 'subtitle',
               }}

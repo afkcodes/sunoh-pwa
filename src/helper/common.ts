@@ -239,3 +239,54 @@ export const isColorDark = (color: string) => {
 
 export const getUniqueId = () =>
   Date.now().toString(36) + Math.random().toString(36).substr(2);
+
+interface Artist {
+  name: string;
+  id: string;
+  image: Array<{ quality: string; link: string }>;
+  type: string;
+}
+
+type ArtistsInput = Artist[] | string;
+
+export function getArtistNames(data: ArtistsInput): string {
+  if (typeof data === 'string') {
+    // If the input is already a string, return it as is
+    return data;
+  }
+
+  if (Array.isArray(data)) {
+    // If it's an array of artist objects, extract and join the names
+    const names = data.map((artist) => artist.name.trim());
+    return names.join(', ');
+  }
+
+  // If it's neither a string nor an array, return an empty string or handle the error as needed
+  return '';
+}
+
+export function decodeHtmlEntities(text: string): string {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(text, 'text/html');
+  return doc.documentElement.textContent || '';
+}
+
+export function timeToReadable(seconds: number) {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+
+  if (hours > 0) {
+    return `${hours}:${minutes.toString().padStart(2, '0')}:${secs
+      .toString()
+      .padStart(2, '0')}`;
+  } else if (minutes > 0) {
+    return `${minutes}:${secs.toString().padStart(2, '0')}`;
+  } else {
+    return `0:${secs}`;
+  }
+}
+
+export function getNonEmptyStringData(data: string) {
+  return data && data?.length > 0 ? data : null;
+}

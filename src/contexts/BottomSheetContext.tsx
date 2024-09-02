@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import BottomSheet, { BottomSheetProps } from '~components/BottomSheet/BottomSheet';
+import BottomSheet from '~components/BottomSheet/BottomSheet';
 import Button from '~components/Button/Button';
+import { BottomSheetProps } from '~types/component.types';
 
 interface BottomSheetProviderProps {
   children: React.ReactNode;
@@ -25,17 +26,18 @@ const BottomSheetContext = createContext({
 
 const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({ children }) => {
   const openSheet = (config: BottomSheetProps) => {
-    setBottomSheetConfig((prevState) => ({ ...prevState, ...config }));
+    setBottomSheetConfig((prevState: any) => ({ ...prevState, ...config }));
   };
 
   const closeSheet = () => {
-    setBottomSheetConfig((prevState) => ({ ...prevState, isOpen: false }));
+    setBottomSheetConfig((prevState: any) => ({ ...prevState, isOpen: false }));
   };
 
   const [bottomSheetConfig, setBottomSheetConfig] = useState<BottomSheetProps>({
     children: <BaseModal close={closeSheet} />,
     isOpen: false,
     onClose: closeSheet,
+    name: 'base_sheet',
   });
 
   // For making sure when the drawer is open we do not navigate instead close the drawer

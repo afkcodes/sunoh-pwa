@@ -1,16 +1,16 @@
 import { cva } from 'class-variance-authority';
 
 export const buttonStyles = cva(
-  'transition-all duration-300 flex justify-center items-center',
+  'transition-all duration-300 ease-in flex justify-center items-center',
   {
     variants: {
       variant: {
-        primary: `bg-button-primary-default hover:bg-button-primary-hover active:bg-button-primary-active`,
+        primary: `bg-button-primary-default md:hover:bg-button-primary-hover active:bg-button-primary-active`,
         secondary:
-          'bg-button-secondary-default hover:bg-button-secondary-hover active:bg-button-secondary-active',
+          'bg-button-secondary-default md:hover:bg-button-secondary-hover active:bg-button-secondary-active',
         tertiary:
-          'bg-button-tertiary-default hover:bg-button-tertiary-hover active:bg-button-tertiary-active',
-        dark: 'bg-button-dark-default hover:bg-button-dark-hover active:bg-button-dark-active',
+          'bg-button-tertiary-default md:hover:bg-button-tertiary-hover active:bg-button-tertiary-active',
+        dark: 'bg-button-dark-default md:hover:bg-button-dark-hover active:bg-button-dark-active',
         outline: 'bg-transparent border active:bg-button-dark-default text-current',
         unstyled: 'bg-transparent text-current',
       },

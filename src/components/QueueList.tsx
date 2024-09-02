@@ -7,8 +7,8 @@ import Figure from './Figure/Figure';
 import TextLink from './TextLink/TextLink';
 
 const QueueList = ({ onClose }: any) => {
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [currentSong, setCurrentSong] = useState({
+  // const [isPlaying, setIsPlaying] = useState(true);
+  const [currentSong] = useState({
     id: 0,
     title: 'Blinding Lights',
     artist: 'The Weeknd',
@@ -16,7 +16,7 @@ const QueueList = ({ onClose }: any) => {
     progress: 65,
     image: 'https://a10.gaanacdn.com/gn_img/albums/Rz4W8vKxD5/4W87PAOO3x/size_l.jpg',
   });
-  const [queue, setQueue] = useState([
+  const [queue] = useState([
     {
       id: 1,
       title: 'Shape of You',
@@ -47,7 +47,7 @@ const QueueList = ({ onClose }: any) => {
     },
   ]);
 
-  const togglePlay = () => setIsPlaying(!isPlaying);
+  // const togglePlay = () => setIsPlaying(!isPlaying);
 
   // Animation variants
   const containerVariants = {
@@ -74,10 +74,10 @@ const QueueList = ({ onClose }: any) => {
     },
   };
 
-  const playButtonVariants = {
-    playing: { scale: 1 },
-    paused: { scale: 1.1 },
-  };
+  // const playButtonVariants = {
+  //   playing: { scale: 1 },
+  //   paused: { scale: 1.1 },
+  // };
 
   return (
     <div className='w-full h-screen p-4 overflow-hidden text-white bg-gradient-to-b from-gray-900 to-black'>
@@ -144,53 +144,6 @@ const QueueList = ({ onClose }: any) => {
               </motion.p>
             </div>
           </div>
-          {/* <motion.div
-            className='flex items-center justify-between mt-4'
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}>
-            <div className='flex space-x-4'>
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                className='text-white transition-colors hover:text-green-400'>
-                <LuShuffle size={20} />
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                className='text-white transition-colors hover:text-green-400'>
-                <LuSkipForward size={20} />
-              </motion.button>
-              <motion.button
-                variants={playButtonVariants}
-                animate={isPlaying ? 'playing' : 'paused'}
-                onClick={togglePlay}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                className='text-white transition-colors hover:text-green-400'>
-                {isPlaying ? <LuPause size={24} /> : <LuPlay size={24} />}
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                className='text-white transition-colors hover:text-green-400'>
-                <LuRepeat size={20} />
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                className='text-white transition-colors hover:text-green-400'>
-                <LuVolume2 size={20} />
-              </motion.button>
-            </div>
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className='text-white transition-colors hover:text-red-400'>
-              <LuHeart size={20} />
-            </motion.button>
-          </motion.div> */}
         </div>
       </motion.div>
 
@@ -210,13 +163,13 @@ const QueueList = ({ onClose }: any) => {
               variants={itemVariants}
               layout
               className='flex items-center justify-between p-2 mb-2 transition-colors rounded-lg hover:bg-gray-800'
-              whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}>
+              whileTap={{ scale: 1.02, transition: { duration: 0.2 } }}>
               <div className='flex items-center space-x-4'>
                 <motion.img
                   src={song.image}
                   alt={song.title}
                   className='w-12 h-12 rounded-md'
-                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 1.1 }}
                   transition={{ duration: 0.2 }}
                 />
                 <div>

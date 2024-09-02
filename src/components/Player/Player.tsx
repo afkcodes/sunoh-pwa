@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { MdLyrics, MdOutlineLyrics } from 'react-icons/md';
 import {
+  RiEqualizer3Line,
   RiHeartFill,
   RiHeartLine,
   RiListUnordered,
@@ -15,16 +16,16 @@ import {
   RiShuffleLine,
   RiSkipBackFill,
   RiSkipForwardFill,
-  RiVolumeMuteLine,
-  RiVolumeUpLine,
 } from 'react-icons/ri';
 import BottomSheet from '~components/BottomSheet/BottomSheet';
 import Button from '~components/Button/Button';
+import Equalizer from '~components/Equalizer';
 import Figure from '~components/Figure/Figure';
 import Marquee from '~components/Marquee/Marquee';
 import QueueList from '~components/QueueList';
 import Slider from '~components/Slider/Slider';
 import TextLink from '~components/TextLink/TextLink';
+import useDominantColorPalette from '~hooks/useDominantColor';
 
 const PlayerScreen = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -33,12 +34,16 @@ const PlayerScreen = () => {
   const [isShuffleOn, setIsShuffleOn] = useState(false);
   const [showLyrics, setShowLyrics] = useState(false);
   const [volume, setVolume] = useState(75);
-  const [isMuted, setIsMuted] = useState(false);
   const [currentTime, setCurrentTime] = useState(120);
   const [duration, setDuration] = useState(225); // Example duration: 3:45
   const [trackData, setTrackData] = useState<any>(null);
   const [isJamming, setIsJamming] = useState(false);
   const [isQueueVisible, setIsQueueVisible] = useState(false);
+  const [isEqVisible, setEqVisible] = useState(false);
+
+  const { palette } = useDominantColorPalette(
+    'https://c.saavncdn.com/214/Teri-Baaton-Mein-Aisa-Uljha-Jiya-Hindi-2024-20240205151011-500x500.jpg'
+  );
 
   useEffect(() => {
     // Simulating fetching track data from a backend
@@ -49,7 +54,7 @@ const PlayerScreen = () => {
         artist: 'The Weeknd',
         album: 'After Hours',
         albumArt:
-          'https://dx35vtwkllhj9.cloudfront.net/universalstudios/despicable-me-4/images/gallery/image6.jpg',
+          'https://c.saavncdn.com/214/Teri-Baaton-Mein-Aisa-Uljha-Jiya-Hindi-2024-20240205151011-500x500.jpg',
         lyrics: `
         Bhigi Bhigi Raaton Men, Mithi Mithi Baaton Men
         Aisi Barasaato Men, Kaisaa Lagataa Hai?
@@ -61,6 +66,7 @@ const PlayerScreen = () => {
       setDuration(122);
       setCurrentTime(122);
     };
+    console.log(volume);
 
     fetchTrackData();
   }, []);
@@ -71,15 +77,6 @@ const PlayerScreen = () => {
   const toggleShuffle = () => setIsShuffleOn(!isShuffleOn);
   const toggleLyrics = () => setShowLyrics(!showLyrics);
 
-  const toggleMute = () => {
-    setIsMuted(!isMuted);
-    if (!isMuted) {
-      setVolume(0);
-    } else {
-      setVolume(75); // or the last non-zero volume
-    }
-  };
-
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
@@ -87,7 +84,11 @@ const PlayerScreen = () => {
   };
 
   return (
-    <div className='relative flex flex-col min-h-screen text-text-primary p-7 bg-gradient-to-b from-gray-900 to-black'>
+    <div
+      className='relative flex flex-col min-h-screen transition-all duration-200 ease-in text-text-primary p-7 bg-gradient-to-b from-gray-900 to-black'
+      style={{
+        background: `linear-gradient(to bottom, ${palette[0]} , #000 80%)`,
+      }}>
       {/* Top Bar */}
       <div className='flex items-center justify-between mb-4'>
         <Button
@@ -119,7 +120,7 @@ const PlayerScreen = () => {
             }`}>
             <Figure
               src={[
-                'https://m.media-amazon.com/images/M/MV5BNDA5OWE3YTUtNjU0Mi00MWI0LTg3ODgtYmUwNzdkNTdiOWQ2XkEyXkFqcGdeQXVyOTI3MzI4MzA@._V1_.jpg',
+                'https://c.saavncdn.com/214/Teri-Baaton-Mein-Aisa-Uljha-Jiya-Hindi-2024-20240205151011-500x500.jpg',
               ]}
               size='full'
               radius='md'
@@ -213,7 +214,7 @@ const PlayerScreen = () => {
         <Button
           variant='unstyled'
           onClick={togglePlayPause}
-          classNames={`p-3 m-0  bg-surface text-text-primary transition-all duration-150  active:scale-90 
+          classNames={`p-3 m-0  bg-surface text-text-primary transition-all duration-100 active:scale-90 
           ${isPlaying ? 'rounded-xl' : 'rounded-full'}`}>
           {isPlaying ? <RiPauseMiniFill size={56} /> : <RiPlayMiniFill size={56} />}
         </Button>
@@ -244,30 +245,15 @@ const PlayerScreen = () => {
           </Button>
 
           <Button
-            onClick={toggleMute}
+            onClick={() => {
+              setEqVisible(true);
+            }}
             variant='unstyled'
             classNames='p-0 ml-6 transition-all text-text-secondary active:text-text-primary active:scale-90'>
-            {isMuted ? <RiVolumeMuteLine size={24} /> : <RiVolumeUpLine size={24} />}
+            <RiEqualizer3Line size={24} />
           </Button>
         </div>
-        <div className='flex items-center w-40'>
-          <Slider
-            max={100}
-            min={0}
-            value={[50]}
-            step={1}
-            onChange={(val: number) => {
-              console.log(val);
-              setVolume(val);
-              if (val === 0) {
-                setIsMuted(true);
-              } else {
-                setIsMuted(false);
-              }
-            }}
-            label='volume'
-          />
-        </div>
+
         <div className='flex'>
           <Button
             onClick={() => {
@@ -292,7 +278,7 @@ const PlayerScreen = () => {
       <BottomSheet
         isOpen={isQueueVisible}
         dismissible={false}
-        name='queue_screen'
+        name='queue_sheet'
         onClose={() => {
           setIsQueueVisible(false);
         }}>
@@ -301,6 +287,16 @@ const PlayerScreen = () => {
             setIsQueueVisible(false);
           }}
         />
+      </BottomSheet>
+
+      <BottomSheet
+        isOpen={isEqVisible}
+        dismissible={false}
+        name='eq_sheet'
+        onClose={() => {
+          setEqVisible(false);
+        }}>
+        <Equalizer />
       </BottomSheet>
     </div>
   );

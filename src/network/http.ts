@@ -4,6 +4,7 @@ type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 interface HttpOptions {
   method?: HttpMethod;
   params?: Record<string, any>;
+  pathParams?: Record<string, string>;
   headers?: Record<string, string>;
   body?: any;
   expectedStatus?: number | number[];
@@ -14,6 +15,7 @@ async function http<T>(url: string, options: HttpOptions = {}): Promise<T | null
   const {
     method = 'GET',
     params,
+    pathParams,
     headers = {},
     body,
     expectedStatus = 200,
@@ -44,6 +46,15 @@ async function http<T>(url: string, options: HttpOptions = {}): Promise<T | null
   }
 
   let requestUrl = url;
+
+  // Process path parameters
+  if (pathParams) {
+    Object.entries(pathParams).forEach(([key, value]) => {
+      requestUrl = requestUrl.replace(`:${key}`, encodeURIComponent(value));
+    });
+  }
+
+  // Process query parameters
   if (params) {
     const queryParams = new URLSearchParams(params);
     requestUrl += `?${queryParams.toString()}`;

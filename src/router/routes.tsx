@@ -1,8 +1,11 @@
+import { lazy, Suspense } from 'react';
 import { RouteObject } from 'react-router-dom';
 import LayoutContainer from '~containers/LayoutContainer';
-import Home from '~pages/Home';
-import Library from '~pages/Library';
-import Search from '~pages/Search';
+
+const Home = lazy(() => import('~pages/Home'));
+const Search = lazy(() => import('~pages/Search'));
+const Library = lazy(() => import('~pages/Library'));
+const Album = lazy(() => import('~pages/Album'));
 
 const routes: RouteObject[] = [
   {
@@ -11,16 +14,36 @@ const routes: RouteObject[] = [
     children: [
       {
         path: 'home',
-        element: <Home />,
+        element: (
+          <Suspense fallback={<div className='w-full bg-white h-dvh'>loading</div>}>
+            <Home />
+          </Suspense>
+        ),
         index: true,
       },
       {
         path: '/search',
-        element: <Search />,
+        element: (
+          <Suspense fallback={<div>loading</div>}>
+            <Search />
+          </Suspense>
+        ),
       },
       {
         path: '/library',
-        element: <Library />,
+        element: (
+          <Suspense fallback={<div>loading</div>}>
+            <Library />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/album/:albumId',
+        element: (
+          <Suspense fallback={<div>loading</div>}>
+            <Album />
+          </Suspense>
+        ),
       },
     ],
   },

@@ -90,13 +90,24 @@
   --page-transition-animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+@layer utilities {
+  /* Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+}
+
 html,
 body {
   width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
   font-family: 'Lexend', sans-serif;
   overscroll-behavior: contain;
   user-select: none;
@@ -116,7 +127,6 @@ body {
 }
 
 #root {
-  overflow-x: hidden;
   min-height: 100vh;
   width: 100%;
 }
@@ -143,28 +153,27 @@ body {
   }
 
   ::view-transition-old(main-content) {
-    animation-name: android-slide-out;
-    opacity: 0;
+    animation-name: fade-out;
   }
 
   ::view-transition-new(main-content) {
-    animation-name: android-slide-in;
+    animation-name: fade-in;
     mix-blend-mode: normal;
     z-index: 1;
     opacity: 0;
   }
 
   .back-transition::view-transition-new(main-content) {
-    animation-name: android-slide-out-reverse;
+    animation-name: fade-in;
     z-index: 1;
-    opacity: 1;
+    opacity: 0;
   }
 
   .back-transition::view-transition-old(main-content) {
-    animation-name: android-slide-in-reverse;
+    animation-name: fade-out;
     mix-blend-mode: normal;
     z-index: 1;
-    opacity: 0;
+    opacity: 1;
   }
 
   .reload-transition::view-transition-new(main-content) {
@@ -174,98 +183,6 @@ body {
 
   .reload-transition::view-transition-old(main-content) {
     animation-name: fade-out;
-  }
-}
-
-@keyframes android-slide-out {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-100%);
-  }
-}
-
-@keyframes android-slide-out-reverse {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-
-@keyframes android-slide-in {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-
-@keyframes android-slide-in-reverse {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(100%);
-  }
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes fade-out {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-/* Slide */
-
-@keyframes slide-out {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-20%);
-  }
-}
-
-@keyframes slide-out-reverse {
-  from {
-    transform: translateX(-20%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-
-@keyframes slide-in {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-
-@keyframes slide-in-reverse {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(100%);
   }
 }
 

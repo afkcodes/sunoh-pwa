@@ -172,7 +172,7 @@
 // export default MiniPlayer;
 
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   RiHeartFill,
   RiHeartLine,
@@ -192,6 +192,10 @@ const MiniPlayer = () => {
   const [isJamming, setIsJamming] = useState(false);
   const [isPlayerExpanded, setPlayerExpanded] = useState(false);
   const [progress, setProgress] = useState(50); // Current progress (0-100)
+
+  useEffect(() => {
+    setProgress(75);
+  }, []);
 
   return (
     <motion.div

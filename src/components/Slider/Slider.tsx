@@ -8,6 +8,7 @@ interface SliderProps {
   value: number[];
   step?: number;
   label?: string;
+  orientation?: 'horizontal' | 'vertical' | undefined;
 }
 
 const Slider: React.FC<SliderProps> = ({
@@ -17,6 +18,7 @@ const Slider: React.FC<SliderProps> = ({
   value = [50],
   step = 1,
   label = 'slider',
+  orientation = 'horizontal',
 }) => {
   const onValueChange = (value: any) => {
     if (onChange) {
@@ -26,13 +28,14 @@ const Slider: React.FC<SliderProps> = ({
 
   return (
     <RangeSlider.Root
+      orientation={orientation}
       className='relative flex items-center flex-1 w-full h-5 select-none touch-none'
       defaultValue={value}
       onValueChange={onValueChange}
       max={max}
       min={min}
       step={step}>
-      <RangeSlider.Track className='relative h-0.5 bg-text-tertiary/60 backdrop-blur rounded-md grow'>
+      <RangeSlider.Track className='relative h-0.5 rounded-md bg-text-tertiary/60 backdrop-blur grow'>
         <RangeSlider.Range className='absolute h-full rounded-md bg-gradient-to-r from-tertiary-default to-primary-default' />
       </RangeSlider.Track>
       <RangeSlider.Thumb

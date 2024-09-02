@@ -1,4 +1,5 @@
 import { SetStateAction, useState } from 'react';
+import Observer from '~components/Observer/Observer';
 import { merge } from '~helper/twMerge.config';
 import { FigureProps, ImageStatus } from '../../types/component.types';
 import Image from '../Image/Image';
@@ -22,14 +23,16 @@ const Figure: React.FC<FigureProps> = ({
   return (
     <figure className={className} tabIndex={0} style={{ backgroundColor: dominantColor }}>
       {mode === 'single' ? (
-        <Image
-          src={sourceImages as string}
-          alt={alt}
-          loading={loading}
-          fit={fit}
-          setLoadStatus={setLoadStatus}
-          position={position}
-        />
+        <Observer observerOption={{ threshold: 0 }}>
+          <Image
+            src={sourceImages as string}
+            alt={alt}
+            loading={loading}
+            fit={fit}
+            setLoadStatus={setLoadStatus}
+            position={position}
+          />
+        </Observer>
       ) : (
         <div
           className='grid w-full h-full grid-cols-6 grid-rows-6 gap-1 p-2 overflow-hidden bg-surface'
@@ -53,14 +56,16 @@ const Figure: React.FC<FigureProps> = ({
                   style={{
                     gridArea: `img${index + 1}`,
                   }}>
-                  <Image
-                    src={item}
-                    alt={alt}
-                    loading={loading}
-                    fit={fit}
-                    setLoadStatus={setLoadStatus}
-                    position={position}
-                  />
+                  <Observer observerOption={{ threshold: 0 }}>
+                    <Image
+                      src={item}
+                      alt={alt}
+                      loading={loading}
+                      fit={fit}
+                      setLoadStatus={setLoadStatus}
+                      position={position}
+                    />
+                  </Observer>
                 </div>
               );
             })}

@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import { Response } from '~types/common.types';
 
 const useFetch = ({
   queryKey,
@@ -8,7 +7,7 @@ const useFetch = ({
   staleTime = 50000,
 }: {
   queryKey: string[];
-  queryFn: (param?: any) => Promise<Response>;
+  queryFn: (param?: any) => any;
   shouldFetchOnLoad?: boolean;
   staleTime?: number;
 }) => {
@@ -25,7 +24,7 @@ const useFetch = ({
     isLoading,
     isFetched,
     refetch,
-    data,
+    data: data?.data,
     isSuccess,
     isPending,
     status,
