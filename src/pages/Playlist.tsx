@@ -1,23 +1,29 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Fragment, useEffect, useRef, useState } from 'react';
-import { LuChevronLeft, LuHeart, LuMoreVertical, LuShuffle } from 'react-icons/lu';
+import { Fragment, useCallback, useRef } from 'react';
+import { LuHeart, LuMoreVertical, LuShuffle } from 'react-icons/lu';
 import { RiPauseMiniFill, RiPlayMiniFill, RiShareForwardLine } from 'react-icons/ri';
-import { useParams } from 'wouter';
+import { useLocation, useParams } from 'wouter';
+import ActionHeader from '~components/ActionHeader';
 import Button from '~components/Button/Button';
 import Figure from '~components/Figure/Figure';
+import Section from '~components/Section/Section';
 import TextLink from '~components/TextLink/TextLink';
+import { componentConfig } from '~configs/component.config';
 import { dataConfigs } from '~configs/data.config';
 import AudioItemContainer from '~containers/AudioItemContainer';
 import AudioStateContainer from '~containers/AudioStateContainer';
+import { createMediaTrack } from '~helper/common';
 import { mediaActions } from '~helper/mediaActions';
 import useFetch from '~hooks/useFetch';
 import useScrollToTop from '~hooks/useScrollToTop';
 import { endpoints } from '~network/endpoints';
 import http from '~network/http';
+import { audio } from '~states/audioStore';
 
 const PlaylistScreen = () => {
   const containerRef = useRef(null);
   const { playlistId } = useParams();
+  const [, navigate] = useLocation();
 
   const { scrollY } = useScroll({
     target: containerRef,
@@ -25,19 +31,6 @@ const PlaylistScreen = () => {
   });
   const imageScale = useTransform(scrollY, [0, 700], [1, 0.5]);
   const titleRef = useRef<HTMLHeadingElement>(null);
-  const [isHeaderVisible, setIsHeaderVisible] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (titleRef.current) {
-        const titlePosition = titleRef.current.getBoundingClientRect().top;
-        setIsHeaderVisible(titlePosition < 0);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const params = new URL(window.location.href).searchParams;
   const category = params.get('category');
@@ -47,11 +40,12 @@ const PlaylistScreen = () => {
       ? `${endpoints.saavn.mix}/${playlistId}`
       : `${endpoints.saavn.playlist}/${playlistId}`;
 
-  const { data, isLoading } = useFetch({
+  const { data: playlistData, isLoading } = useFetch({
     queryKey: [`playlist_${playlistId}`],
     queryFn: async () => await http(url),
   });
 
+  const data = category === 'mix' ? playlistData : playlistData?.album;
   const onShuffle = () => {
     mediaActions.shuffle(data);
   };
@@ -59,6 +53,29 @@ const PlaylistScreen = () => {
   const onPlayAll = () => {
     mediaActions.playAll(data);
   };
+
+  const play = (item: any) => {
+    const mediaTrack = createMediaTrack(item, '160kbps');
+    audio.addMediaAndPlay(mediaTrack);
+  };
+
+  const onClick = useCallback(
+    (category: string, token: string, item: any) => {
+      const routes: Record<string, string> = {
+        album: `/album/${token}`,
+        playlist: `/playlist/${token}`,
+        mix: `/playlist/${token}?category=mix`,
+        artist: `/artist/${token}`,
+      };
+      if (category === 'song') {
+        play(item);
+      } else {
+        navigate(routes[category] || '/');
+      }
+    },
+
+    [navigate]
+  );
 
   useScrollToTop();
 
@@ -70,36 +87,10 @@ const PlaylistScreen = () => {
         <div
           ref={containerRef}
           className='relative min-h-screen overflow-y-auto text-white bg-background'>
-          <motion.div
-            initial={{ opacity: 0, y: 0 }}
-            animate={{
-              opacity: isHeaderVisible ? 1 : 0,
-              y: isHeaderVisible ? 0 : -20,
-            }}
-            transition={{ duration: 0.3 }}
-            className='fixed top-0 left-0 right-0 z-20 flex justify-between py-3 bg-surface bg-opacity-70 backdrop-blur-md'>
-            <Button
-              variant='unstyled'
-              classNames='p-0 m-0 transition-all duration-300 active:scale-90 pl-4'
-              size='md'
-              radius='full'
-              onClick={() => {}}>
-              <LuChevronLeft size={24} />
-            </Button>
-            <div className='text-center'>
-              <TextLink weight='medium' size='md'>
-                {data?.title}
-              </TextLink>
-            </div>
-            <Button
-              variant='unstyled'
-              classNames='p-0 m-0 transition-all duration-300 active:scale-90 pr-3.5'
-              size='md'
-              radius='full'
-              onClick={() => {}}>
-              <LuMoreVertical size={24} />
-            </Button>
-          </motion.div>
+          {/* Header */}
+          {data && (
+            <ActionHeader ref={titleRef} title={data.title} onMoreClick={() => {}} />
+          )}
           {/* Content */}
           <div className='relative z-10 min-h-screen pt-3'>
             <div className='flex flex-col items-center p-4 mb-2'>
@@ -202,6 +193,52 @@ const PlaylistScreen = () => {
                   type: 'thumbnail',
                 }}
               />
+            </div>
+
+            <div className='space-y-4'>
+              {playlistData.sections.map((section: any, idx: number) => {
+                return (
+                  <Section
+                    key={idx}
+                    headerConfig={{
+                      textLinkConfig: componentConfig.headerConfig,
+                      actionButtonConfig: {
+                        ...componentConfig.headerActionButtonConfig,
+                        onClick: () => {},
+                        children: 'More',
+                      },
+                    }}
+                    data={section}
+                    config={
+                      section.data[0].type === 'song'
+                        ? dataConfigs.audio
+                        : dataConfigs.album
+                    }
+                    containerConfig={{
+                      tileContainerConfig: {
+                        layout: section.data[0].type === 'song' ? 'list' : 'scrollList',
+                        onTileClick: onClick,
+                        tileConfig:
+                          section?.data?.[0]?.type === 'song'
+                            ? {
+                                figureConfig: { fit: 'cover', size: 'xs' },
+                                titleConfig: { size: 'sm', weight: 'medium' },
+                                subTitleConfig: { size: 'xs' },
+                              }
+                            : {
+                                ...componentConfig.albumTileConfig,
+                                figureConfig: {
+                                  size: 'xl',
+                                  fit: 'cover',
+                                  radius:
+                                    section?.data?.[0]?.type === 'artist' ? 'full' : 'sm',
+                                },
+                              },
+                      },
+                    }}
+                  />
+                );
+              })}
             </div>
           </div>
         </div>

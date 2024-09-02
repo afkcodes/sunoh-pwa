@@ -25,7 +25,12 @@ import QueueList from '~components/QueueList';
 import Slider from '~components/Slider/Slider';
 import TextLink from '~components/TextLink/TextLink';
 import { getDominantColor } from '~helper/colorExtractor';
-import { getColorWithOpacity, rgbToHex, timeToReadable } from '~helper/common';
+import {
+  getColorWithOpacity,
+  rgbToHex,
+  timeToReadable,
+  updateStatusBarColor,
+} from '~helper/common';
 import { detectOS, OperatingSystem } from '~helper/deviceDetector';
 import { mediaActions } from '~helper/mediaActions';
 import { audio, useAudio } from '~states/audioStore';
@@ -65,7 +70,13 @@ const PlayerScreen = () => {
     ).then((res) => {
       const arr = res?.split(',');
       setColor(rgbToHex(Number(arr[0]), Number(arr[1]), Number(arr[2])));
+      updateStatusBarColor(
+        getColorWithOpacity(rgbToHex(Number(arr[0]), Number(arr[1]), Number(arr[2])), 0.5)
+      );
     });
+    return () => {
+      updateStatusBarColor('#0A0A0A');
+    };
   }, [audioState.currentTrack]);
 
   return (
@@ -101,7 +112,7 @@ const PlayerScreen = () => {
             showLyrics ? 'w-1/2' : 'w-full'
           } transition-all duration-400 ease-in-out flex flex-col items-center`}>
           <div
-            className={`my-4 transition-transform duration-300 ease-in-out transform shadow-2xl ${
+            className={`my-4 transition-transform duration-300 aspect-square min-h-64 min-w-64 shrink-0 ease-in-out transform shadow-2xl ${
               isPlaying ? 'scale-1' : ' scale-[80%]'
             }`}>
             <Figure
@@ -115,6 +126,7 @@ const PlayerScreen = () => {
               alt=''
               fit='cover'
               position='top'
+              shouldUseObserver={false}
             />
           </div>
           <div className='flex items-start justify-between w-full text-start'>

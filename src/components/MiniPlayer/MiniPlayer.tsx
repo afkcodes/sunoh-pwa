@@ -1,11 +1,10 @@
 import { motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  RiHeartFill,
-  RiHeartLine,
   RiPauseMiniFill,
   RiPlayMiniFill,
   RiRfidLine,
+  RiSkipForwardFill,
 } from 'react-icons/ri';
 import Button from '~components/Button/Button';
 import Figure from '~components/Figure/Figure';
@@ -13,31 +12,43 @@ import TextLink from '~components/TextLink/TextLink';
 import { getDominantColor } from '~helper/colorExtractor';
 import { getColorWithOpacity, rgbToHex } from '~helper/common';
 import { mediaActions } from '~helper/mediaActions';
-import { useAudio } from '~states/audioStore';
+import { audio, useAudio } from '~states/audioStore';
 
 const MiniPlayer: React.FC = () => {
   const [audioState] = useAudio();
-  const [isLiked, setIsLiked] = useState(false);
   const [isJamming, setIsJamming] = useState(false);
-  const isPlaying = audioState.playbackState === 'playing';
   const [color, setColor] = useState('');
 
-  const onPlayOrPause = () => {
+  const { currentTrack, playbackState, progress, duration } = audioState;
+  const isPlaying = playbackState === 'playing';
+
+  const onPlayOrPause = useCallback(() => {
     mediaActions.playOrPause(isPlaying, audioState);
-  };
+  }, [isPlaying, audioState]);
+
+  const onSkipForward = useCallback(() => {
+    audio.playNext();
+  }, []);
+
+  const toggleJamming = useCallback(() => {
+    setIsJamming((prev) => !prev);
+  }, []);
 
   useEffect(() => {
-    getDominantColor(
-      audioState.currentTrack.artwork ? audioState.currentTrack.artwork[0].src : ''
-    )
+    const artworkSrc = currentTrack.artwork?.[0]?.src || '';
+    getDominantColor(artworkSrc)
       .then((res) => {
-        const arr = res?.split(',');
-        setColor(rgbToHex(Number(arr[0]), Number(arr[1]), Number(arr[2])));
+        const [r, g, b] = res?.split(',').map(Number) || [];
+        setColor(rgbToHex(r, g, b));
       })
       .catch(() => {});
-  }, [audioState.currentTrack]);
+  }, [currentTrack.artwork]);
 
-  if (!audioState.currentTrack.source) {
+  const progressPercentage = useMemo(() => {
+    return ((progress as number) / (duration as number) || 0) * 100;
+  }, [progress, duration]);
+
+  if (!currentTrack.source) {
     return null;
   }
 
@@ -55,70 +66,48 @@ const MiniPlayer: React.FC = () => {
         <motion.div
           className='absolute inset-0 bg-gradient-to-r from-surface/20 to-white/15'
           initial={{ right: '100%' }}
-          animate={{
-            right: `${
-              100 -
-              ((audioState.progress as number) / (audioState.duration as number) || 0) *
-                100
-            }%`,
-          }}
+          animate={{ right: `${100 - progressPercentage}%` }}
           transition={{ duration: 1, ease: 'linear' }}
         />
 
         <div className='relative z-10 flex items-center justify-between h-16 px-3'>
-          <div>
-            <Figure
-              src={[
-                audioState.currentTrack.artwork
-                  ? audioState.currentTrack.artwork[1].src
-                  : '',
-              ]}
-              alt='Album Cover'
-              fit='cover'
-              radius='sm'
-              size='xs'
-            />
-          </div>
-          <div className='flex flex-col items-start justify-start flex-grow ml-3 mr-1 '>
+          <Figure
+            src={[currentTrack.artwork?.[1]?.src || '']}
+            alt='Album Cover'
+            fit='cover'
+            radius='sm'
+            size='xs'
+          />
+          <div className='flex flex-col items-start justify-start flex-grow ml-3 mr-1'>
             <TextLink size='sm' weight='semibold' classNames='text-start'>
-              {audioState.currentTrack.title}
+              {currentTrack.title}
             </TextLink>
             <TextLink size='xs' color='light' classNames='text-start'>
-              {audioState.currentTrack.artist}
+              {currentTrack.artist}
             </TextLink>
           </div>
           <div className='flex items-center space-x-3'>
             <Button
-              variant='unstyled'
-              onClick={() => {
-                setIsLiked(!isLiked);
-              }}
-              classNames={`transition-all duration-300 p-0 m-0 ${
-                isLiked
-                  ? 'text-primary-default'
-                  : 'text-text-secondary active:text-text-primary active:scale-[90%]'
-              }`}>
-              {isLiked ? <RiHeartFill size={26} /> : <RiHeartLine size={26} />}
-            </Button>
-            <Button
-              onClick={() => {
-                setIsJamming(!isJamming);
-              }}
+              onClick={toggleJamming}
               variant='unstyled'
               classNames={`focus:outline-none transition-colors m-0 p-0 ${
                 isJamming
                   ? 'text-primary-default'
-                  : 'text-text-secondary active:text-text-primary active:scale-[90%]'
+                  : 'text-text-primary active:scale-[90%]'
               }`}>
               <RiRfidLine size={26} />
             </Button>
             <Button
               variant='unstyled'
-              classNames='p-0 m-0 active:scale-[90%] text-text-secondary active:text-text-primary'
-              onClick={() => {
-                onPlayOrPause();
-              }}>
+              classNames='p-0 m-0 active:scale-[90%] text-text-primary'
+              onClick={onPlayOrPause}>
               {isPlaying ? <RiPauseMiniFill size={34} /> : <RiPlayMiniFill size={34} />}
+            </Button>
+            <Button
+              variant='unstyled'
+              onClick={onSkipForward}
+              classNames='transition-all duration-300 p-0 m-0 text-text-primary active:scale-[90%]'>
+              <RiSkipForwardFill size={26} />
             </Button>
           </div>
         </div>

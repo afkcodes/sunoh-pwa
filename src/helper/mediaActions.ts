@@ -9,6 +9,7 @@ import {
   setAudioStore,
   subscribeToAudio,
 } from '~states/audioStore';
+import { getUserStoreSnapShot, setUserStore } from '~states/userStore';
 import { Response } from '~types/common.types';
 import { createMediaTrack, isEmptyObject, isValidArray, MediaQuality } from './common';
 import { dataExtractor } from './dataExtractor';
@@ -16,6 +17,7 @@ import { storage } from './storage';
 
 type MediaState = { audioState: AudioStoreState; queue: MediaTrack[] };
 let isEqEnabled = false;
+let isMediaStateInitialized = false;
 const mediaActions = {
   playAll: (data: any, quality: MediaQuality = '160kbps') => {
     const audioInstance = AudioX.getAudioInstance();
@@ -88,6 +90,13 @@ const mediaActions = {
     }
   },
 
+  getUserState: () => {
+    const userState = storage.getItem('user_state');
+    if (userState) {
+      return JSON.parse(userState);
+    }
+  },
+
   restoreMediaState: () => {
     const mediaState: MediaState = mediaActions.getMediaState() as MediaState;
     if (mediaState?.queue) {
@@ -95,6 +104,14 @@ const mediaActions = {
     }
     if (mediaState?.audioState && isEmptyObject(mediaState.audioState.currentTrack)) {
       setAudioStore(mediaState?.audioState);
+    }
+  },
+
+  restoreUserState: () => {
+    const snap = getUserStoreSnapShot();
+    const userState = mediaActions.getUserState();
+    if (isEmptyObject(userState)) {
+      setUserStore({ ...snap, ...userState });
     }
   },
 
@@ -157,6 +174,7 @@ const mediaActions = {
         const tracks = res.data?.map((item: any) => createMediaTrack(item, '12kbps'));
         audio.addQueue(tracks, 'DEFAULT');
         audio.addMediaAndPlay(null, async (currentTrack: MediaTrack) => {
+          console.log(currentTrack);
           const res: any = await http(`${endpoints.gaana.track}/${currentTrack.id}`);
           const hdUrl = res.data.replace(/128\.mp4/g, '320.mp4');
           currentTrack.source = hdUrl;
@@ -171,7 +189,11 @@ const mediaActions = {
   },
 
   init: () => {
-    mediaActions.saveMediaState();
+    mediaActions.restoreUserState();
+    if (!isMediaStateInitialized) {
+      mediaActions.saveMediaState();
+    }
+    isMediaStateInitialized = true;
   },
 
   playOrPause: (isPlaying: boolean, audioState: AudioStoreState) => {

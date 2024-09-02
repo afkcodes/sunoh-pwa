@@ -1,5 +1,3 @@
-/** @type {import('tailwindcss').Config} */
-
 const withOpacity = (variableName) => {
   return ({ opacityValue }) => {
     if (opacityValue !== undefined) {

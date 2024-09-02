@@ -6,160 +6,145 @@
 
 import { useEffect, useState } from 'react';
 import { isValidObject } from '~helper/common';
-import ChangeNotifier, { ActionSet, ListenerCallback } from './notifier';
+import ChangeNotifier, { ListenerCallback } from './notifier';
 
 /**
  * Checks if a value is a valid object or null.
- * @param {*} value - The value to check.
- * @returns {boolean} - Returns true if the value is a valid object or null, otherwise false.
+ * @param {unknown} value - The value to check.
+ * @returns {boolean} True if the value is a valid object or null, otherwise false.
  */
-export const checkValidObject = (value: any): value is object | null =>
+export const checkValidObject = (
+  value: unknown
+): value is Record<string, unknown> | null =>
   typeof value === 'object' &&
   value !== null &&
   !Array.isArray(value) &&
-  value.constructor === Object;
+  Object.getPrototypeOf(value) === Object.prototype;
 
 /**
- * Compares two values for equality.
- * @param {*} d1 - The first value.
- * @param {*} d2 - The second value.
- * @returns {boolean} - Returns true if the values are equal, otherwise false.
+ * Compares two values for deep equality.
+ * @param {unknown} d1 - The first value to compare.
+ * @param {unknown} d2 - The second value to compare.
+ * @returns {boolean} True if the values are deeply equal, otherwise false.
  */
-const diffChecker = (d1: any, d2: any): boolean => {
-  if (d1 === null && d2 === null) {
-    return true;
-  }
+export const diffChecker = (d1: unknown, d2: unknown): boolean => {
+  // Handle null cases
+  if (d1 === null && d2 === null) return true;
+  if (d1 === null || d2 === null) return false;
 
-  if (d1 === null || d2 === null) {
-    return false;
-  }
+  // Handle type mismatches
+  if (typeof d1 !== typeof d2) return false;
 
-  if (typeof d1 !== typeof d2) {
-    return false;
-  }
+  // Handle primitive types
+  if (typeof d1 !== 'object') return d1 === d2;
 
-  if (typeof d1 !== 'object') {
-    return d1 === d2;
-  }
-
+  // Handle arrays
   if (Array.isArray(d1) && Array.isArray(d2)) {
-    if (d1.length !== d2.length) {
-      return false;
-    }
-
+    if (d1.length !== d2.length) return false;
     return d1.every((item, index) => diffChecker(item, d2[index]));
   }
 
-  const keys1 = Object.keys(d1);
-  const keys2 = Object.keys(d2);
+  // Handle objects
+  if (checkValidObject(d1) && checkValidObject(d2)) {
+    const keys1 = Object.keys(d1);
+    const keys2 = Object.keys(d2);
 
-  if (keys1.length !== keys2.length) {
-    return false;
+    if (keys1.length !== keys2.length) return false;
+
+    return keys1.every((key) => {
+      if (!keys2.includes(key)) return false;
+      return diffChecker(d1[key], d2[key]);
+    });
   }
 
-  return keys1.every((key) => {
-    if (!keys2.includes(key)) {
-      return false;
-    }
-
-    return diffChecker(d1[key], d2[key]);
-  });
+  return false;
 };
 
 /**
- * Creates a custom hook for managing state with ChangeNotifier.
- * @function
- * @param {string} eventName - The name of the event.
- * @param {*} initState - The initial state.
- * @param {string} [slice='default_slice'] - The slice identifier..
- * @returns {Object} - Returns an object containing the custom hook and helper functions.
+ * Creates a custom hook and related functions for managing state with ChangeNotifier.
+ * @template T - The type of the state.
+ * @param {string} eventName - The name of the event associated with this state.
+ * @param {T} initState - The initial state.
+ * @param {string} - The slice identifier for the state.
+ * @returns {Object} An object containing the useStore hook and helper functions.
  */
-
-const create = <T>(eventName: string, initState: T, slice: string = 'default_slice') => {
-  const notifier = ChangeNotifier.getInstance();
+const create = <T>(eventName: string, initState: T, sliceName?: string) => {
+  const slice = sliceName ? sliceName : `${eventName.toLowerCase()}_global`;
+  const notifier = ChangeNotifier.getInstance<T>();
   const prevState = notifier.getState(eventName, slice);
 
   /**
-   * Handles state change events.
-   * @param {*} data - The new state data.
-   * @param {Object} actionSet - Set of action functions.
-   * @param {*} prevState - The previous state.
+   * Callback function to handle state changes.
+   * @type {ListenerCallback<T>}
    */
-  const listenerCallback = (
-    data: any,
-    actionSet: ActionSet,
-    prevState: any,
-    transient?: boolean
+  const listenerCallback: ListenerCallback<T> = (
+    data,
+    actionSet,
+    prevState,
+    transient
   ) => {
-    const isDifferent = diffChecker(data, prevState);
-    if (!transient) {
-      if (!isDifferent) {
-        if (actionSet[slice]?.size) {
-          actionSet[slice].forEach((callback) => {
-            if (callback) {
-              isValidObject(data)
-                ? callback((prev: T) => ({ ...prev, ...data } as T))
-                : callback(data as T);
+    const isDifferent = !diffChecker(data, prevState);
+    if (!transient && isDifferent) {
+      if (actionSet[slice]?.size) {
+        actionSet[slice].forEach((callback) => {
+          if (callback) {
+            if (typeof data === 'object' && data !== null) {
+              // If data is an object, merge it with the previous state
+              callback((prev: T) => ({ ...prev, ...data } as T));
+            } else {
+              // If data is not an object, replace the entire state
+              callback(data);
             }
-          });
-        }
-      } else {
-        console.warn('State update dismissed: previous and current state are same.');
+          }
+        });
       }
-    } else {
-      console.log('updated store transiently');
+    } else if (!isDifferent) {
+      console.warn('State update dismissed: previous and current state are same.');
+    } else if (transient) {
+      console.log('Updated store transiently');
     }
   };
 
-  // Listen for state changes
-  notifier.listen(
-    eventName,
-    (data, actionSet, prevState, transient) =>
-      listenerCallback(data, actionSet, prevState, transient),
-    prevState ? prevState : initState,
-    slice
-  );
+  // Register the listener at the create level
+  notifier.listen(eventName, listenerCallback, prevState || initState, slice);
 
   /**
-   * Returns the value of the state property.
-   * @param {*} state - The current state object.
-   * @returns {*} - Returns the state property value.
+   * Retrieves the current state value, potentially wrapped in a Proxy for object states.
+   * @param {T} state - The current state.
+   * @returns {T} The current state value, possibly wrapped in a Proxy.
    */
-  const getStateValue = (state: T) => {
+  const getStateValue = (state: T): T => {
     if (isValidObject(state)) {
-      const proxyState = new Proxy(state as any, {
-        get: (_target, prop) => {
-          const state: T = notifier.getState(eventName, slice) as T;
-          return state[prop as keyof T];
+      // Create a Proxy for object states to ensure we always get the latest values
+      return new Proxy(state as Record<string, unknown>, {
+        get: (_target, prop: string) => {
+          const currentState = notifier.getState(eventName, slice) as T;
+          return (currentState as Record<string, unknown>)[prop];
         },
-      });
-      return proxyState;
+      }) as T;
     }
-    return notifier.getState(eventName, slice);
+    return notifier.getState(eventName, slice) as T;
   };
 
   /**
    * Custom hook for managing state.
-   * @returns {Array} - Returns an array containing the state and a function to update the state.
+   * @returns {[T, (data: Partial<T>) => void]} A tuple containing the current state and a function to update it.
    */
   const useStore = (): [T, (data: Partial<T>) => void] => {
     const [state, setState] = useState<T>(initState);
 
     useEffect(() => {
+      // Register the action when the component mounts
       notifier.registerAction(setState, slice);
+
+      // Cleanup function to unregister the action when the component unmounts
       return () => {
-        notifier.unsubscribe(
-          eventName,
-          (data, actionSet) => {
-            listenerCallback(data as T, actionSet, prevState as T);
-          },
-          slice
-        );
+        notifier.unregisterAction(setState, slice);
       };
     }, []);
 
     return [
-      getStateValue(state) as T,
+      getStateValue(state),
       (data: Partial<T>) => {
         notifier.notify(eventName, data, slice, false, 'create');
       },
@@ -174,23 +159,32 @@ const create = <T>(eventName: string, initState: T, slice: string = 'default_sli
     setTransient: (data: Partial<T>) => {
       notifier.notify(eventName, data, slice, true, 'create_transient');
     },
-    getStoreSnapshot: () => notifier.getState(eventName, slice) as T, // use this to retrieve state value
-
-    subscribe: (cb: (data: T, actionSet: ActionSet, prevState: T) => void) => {
-      notifier.listen(eventName, cb as ListenerCallback<unknown>, initState, slice);
+    getStoreSnapshot: () => notifier.getState(eventName, slice) as T,
+    subscribe: (cb: ListenerCallback<T>) => {
+      notifier.listen(eventName, cb, initState, slice);
     },
   };
 };
 
-const notify = (
-  event: string,
-  data: any,
-  slice: string = 'default_slice',
+/**
+ * Notifies a state change for a specific event and slice.
+ * @template T - The type of the state.
+ * @param {string} event - The name of the event.
+ * @param {Partial<T>} data - The new state data.
+ * @param {string} - The slice identifier.
+ * @param {boolean} [transient=false] - Whether the update is transient.
+ * @param {string} [caller='notifier_global'] - The caller identifier.
+ */
+const notify = <T>(
+  eventName: string,
+  data: Partial<T>,
+  sliceName?: string,
   transient: boolean = false,
   caller = 'notifier_global'
 ) => {
-  const notifier = ChangeNotifier.getInstance();
-  notifier.notify(event, data, slice, transient, caller);
+  const notifier = ChangeNotifier.getInstance<T>();
+  const slice = sliceName ? sliceName : `${eventName.toLowerCase()}_global`;
+  notifier.notify(eventName, data, slice, transient, caller);
 };
 
 export { create, notify };

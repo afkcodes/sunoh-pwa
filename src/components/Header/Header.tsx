@@ -6,7 +6,7 @@ const Header: React.FC<HeaderProps> = ({ textLinkConfig, actionButtonConfig }) =
   return (
     <div className='flex items-center justify-between px-2 py-1 my-3'>
       <TextLink {...textLinkConfig} />
-      <Button {...actionButtonConfig} />
+      {actionButtonConfig ? <Button {...actionButtonConfig} /> : null}
     </div>
   );
 };

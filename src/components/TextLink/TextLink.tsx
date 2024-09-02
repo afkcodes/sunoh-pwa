@@ -48,6 +48,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 import { Link } from 'wouter';
+import { decodeHtmlEntities } from '~helper/common';
 import { merge } from '~helper/twMerge.config';
 import { TextLinkProps } from '../../types/component.types';
 import { textStyles } from './textLink.styles';
@@ -102,7 +103,7 @@ const TextLink: React.FC<TextLinkPropsWithMarquee> = ({
           {children}
         </Link>
       ) : (
-        <p className={className}>{children}</p>
+        <p className={className}>{decodeHtmlEntities(children as string)}</p>
       )}
     </>
   );

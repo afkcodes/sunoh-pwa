@@ -4,10 +4,11 @@ const dataConfigs = {
     title: 'title',
     artists: 'artists',
     images: 'images.2.link',
-    image: 'images',
-    subtitle: 'subTitle',
+    image: ['images', 'image'],
+    subtitle: ['subTitle', 'subtitle'],
     year: 'releaseYear',
     editor: 'editorFirstName',
+    duration: 'duration',
   },
   audio: {
     id: 'id',

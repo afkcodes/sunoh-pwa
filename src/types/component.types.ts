@@ -24,7 +24,7 @@ export type ObjectPosition =
 // Button types
 export interface ButtonProps extends VariantProps<typeof buttonStyles> {
   children: React.ReactNode;
-  onClick: () => void;
+  onClick: (_param?: any) => void;
   disabled?: boolean;
   prefixIcon?: React.ReactNode;
   suffixIcon?: React.ReactNode;
@@ -55,6 +55,7 @@ export interface FigureProps extends VariantProps<typeof figureStyles> {
   dominantColor?: string;
   mode?: ImageMode;
   id?: string;
+  shouldUseObserver?: boolean;
 }
 
 // TextLink Types
@@ -94,12 +95,12 @@ export interface BottomSheetProps {
 
 export interface HeaderProps {
   textLinkConfig: TextLinkProps;
-  actionButtonConfig: ButtonProps;
+  actionButtonConfig?: ButtonProps;
 }
 
 export interface SectionHeaderProps {
   textLinkConfig: Omit<TextLinkProps, 'children'>;
-  actionButtonConfig: ButtonProps;
+  actionButtonConfig?: ButtonProps;
 }
 
 export interface Song {

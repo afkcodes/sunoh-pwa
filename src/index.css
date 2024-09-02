@@ -3,6 +3,8 @@
 @tailwind utilities;
 
 :root {
+  --pwa-status-bar-color: #0a0a0a;
+
   /* Primary Colors */
   --color-primary: 178, 34, 45; /* #B2222D - Keeping the existing primary color */
   --color-primary-light: 204, 51, 64; /* #CC3340 - Lighter shade of primary */
@@ -201,5 +203,36 @@ body {
   }
   to {
     opacity: 0;
+  }
+}
+
+@media all and (display-mode: standalone) {
+  body {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  #theme-color-transition {
+    height: env(safe-area-inset-top) !important;
+  }
+}
+
+/* For iOS */
+@supports (-webkit-touch-callout: none) {
+  @media all and (display-mode: standalone) {
+    html {
+      --pwa-status-bar-transition: background-color 0.3s ease;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: env(safe-area-inset-top);
+      background-color: var(--pwa-status-bar-color);
+      transition: var(--pwa-status-bar-transition);
+      z-index: 999998;
+    }
   }
 }

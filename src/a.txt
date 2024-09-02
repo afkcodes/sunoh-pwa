@@ -1,0 +1,242 @@
+import { motion } from 'framer-motion';
+import { useState } from 'react';
+
+const ExpandedRetroDevPortfolio = () => {
+  const [activeSection, setActiveSection] = useState('HOME');
+
+  const skills = [
+    'React',
+    'Node.js',
+    'Python',
+    'GraphQL',
+    'AWS',
+    'Docker',
+    'TypeScript',
+    'MongoDB',
+    'Redux',
+    'Jest',
+  ];
+  const projects = [
+    {
+      name: 'E-commerce Platform',
+      description:
+        'Built a scalable online marketplace using microservices architecture.',
+      tech: 'React, Node.js, MongoDB',
+      link: '#',
+    },
+    {
+      name: 'AI Chatbot',
+      description:
+        'Developed an intelligent customer service bot with natural language processing.',
+      tech: 'Python, TensorFlow, Flask',
+      link: '#',
+    },
+    {
+      name: 'Blockchain Wallet',
+      description: 'Created a secure digital wallet for cryptocurrency transactions.',
+      tech: 'Solidity, Web3.js, React',
+      link: '#',
+    },
+    {
+      name: 'Social Media Dashboard',
+      description:
+        'Designed and implemented a comprehensive analytics dashboard for social media management.',
+      tech: 'React, D3.js, Node.js',
+      link: '#',
+    },
+    {
+      name: 'IoT Home Automation',
+      description:
+        'Developed a system to control smart home devices using voice commands and mobile app.',
+      tech: 'React Native, Python, Raspberry Pi',
+      link: '#',
+    },
+    {
+      name: 'Machine Learning Stock Predictor',
+      description:
+        'Created an ML model to predict stock prices based on historical data and news sentiment.',
+      tech: 'Python, Scikit-learn, Flask',
+      link: '#',
+    },
+  ];
+  const experiences = [
+    {
+      title: 'Senior Full Stack Developer',
+      company: 'Tech Innovators Inc.',
+      period: '2020 - Present',
+      description:
+        'Lead development of multiple high-impact projects, mentored junior developers, and implemented CI/CD pipelines.',
+    },
+    {
+      title: 'Full Stack Developer',
+      company: 'StartUp Dynamo',
+      period: '2018 - 2020',
+      description:
+        'Worked in an agile environment to develop and launch multiple web applications from concept to deployment.',
+    },
+    {
+      title: 'Junior Developer',
+      company: 'CodeCrafters LLC',
+      period: '2016 - 2018',
+      description:
+        'Assisted in the development of responsive web applications and gained expertise in front-end technologies.',
+    },
+  ];
+
+  const RetroButton = ({ children, onClick, className = '' }) => (
+    <motion.button
+      className={`border-2 border-black px-4 py-2 bg-yellow-300 text-black font-bold ${className}`}
+      whileHover={{ scale: 1.05, backgroundColor: '#FFA500' }}
+      whileTap={{ scale: 0.95 }}
+      onClick={onClick}>
+      {children}
+    </motion.button>
+  );
+
+  const SectionTitle = ({ children }) => (
+    <h2 className='pb-2 mb-4 text-3xl font-bold border-b-4 border-yellow-300'>
+      {children}
+    </h2>
+  );
+
+  return (
+    <div className='min-h-screen text-black bg-white'>
+      <div className='max-w-6xl p-4 mx-auto font-mono'>
+        <header className='mb-8 text-center'>
+          <motion.h1
+            className='mb-2 text-5xl font-bold'
+            style={{
+              fontFamily: "'Press Start 2P', cursive",
+              textShadow: '2px 2px 0 #FFD700, 4px 4px 0 #FFA500',
+            }}
+            initial={{ y: -50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5 }}>
+            JOHN DOE
+          </motion.h1>
+          <p className='text-xl'>FULL-STACK DEVELOPER & PROBLEM SOLVER</p>
+        </header>
+
+        <nav className='sticky top-0 z-10 flex justify-between py-4 mb-8 bg-white border-black border-y-4'>
+          {['HOME', 'SKILLS', 'PROJECTS', 'EXPERIENCE', 'CONTACT'].map((item) => (
+            <motion.button
+              key={item}
+              className={`text-lg ${
+                activeSection === item ? 'font-bold text-yellow-500' : ''
+              }`}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setActiveSection(item)}>
+              {item}
+            </motion.button>
+          ))}
+        </nav>
+
+        <main>
+          <section id='home' className='mb-12'>
+            <SectionTitle>ABOUT ME</SectionTitle>
+            <div className='grid grid-cols-1 gap-8 md:grid-cols-3'>
+              <div className='p-6 border-2 border-black md:col-span-2'>
+                <p className='mb-4'>
+                  Greetings, fellow netizens! I'm a passionate full-stack developer with a
+                  love for creating innovative digital solutions. With 5+ years of
+                  experience in crafting robust web applications, I thrive on turning
+                  complex problems into elegant, efficient code.
+                </p>
+                <p>
+                  When I'm not immersed in lines of code, you can find me exploring the
+                  latest tech trends, contributing to open-source projects, or optimizing
+                  my mechanical keyboard setup for that perfect typing experience.
+                </p>
+              </div>
+              <div className='p-6 border-2 border-black'>
+                <h3 className='mb-2 font-bold'>QUICK STATS</h3>
+                <ul>
+                  <li>🌐 San Francisco, CA</li>
+                  <li>💼 Available for projects</li>
+                  <li>🚀 5+ years experience</li>
+                  <li>☕ Powered by coffee</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section id='skills' className='mb-12'>
+            <SectionTitle>SKILLS MENU</SectionTitle>
+            <div className='grid grid-cols-2 gap-4 md:grid-cols-4'>
+              {skills.map((skill) => (
+                <motion.div
+                  key={skill}
+                  className='flex items-center justify-center p-4 border-2 border-black'
+                  whileHover={{ scale: 1.05, backgroundColor: '#FFFACD' }}>
+                  <span className='mr-2'>🍕</span> {skill}
+                </motion.div>
+              ))}
+            </div>
+          </section>
+
+          <section id='projects' className='mb-12'>
+            <SectionTitle>PROJECT SPECIALS</SectionTitle>
+            <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
+              {projects.map((project) => (
+                <motion.div
+                  key={project.name}
+                  className='p-6 border-2 border-black'
+                  whileHover={{ y: -5 }}>
+                  <h3 className='mb-2 text-xl font-bold'>{project.name}</h3>
+                  <p className='mb-4 text-sm'>{project.description}</p>
+                  <p className='mb-4 text-xs font-bold'>Tech used: {project.tech}</p>
+                  <RetroButton onClick={() => window.open(project.link, '_blank')}>
+                    View Project
+                  </RetroButton>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+
+          <section id='experience' className='mb-12'>
+            <SectionTitle>WORK HISTORY</SectionTitle>
+            <div className='space-y-6'>
+              {experiences.map((exp, index) => (
+                <motion.div
+                  key={index}
+                  className='p-6 border-2 border-black'
+                  initial={{ opacity: 0, x: -50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5 }}>
+                  <h3 className='text-xl font-bold'>{exp.title}</h3>
+                  <p className='text-lg'>{exp.company}</p>
+                  <p className='mb-2 text-sm'>{exp.period}</p>
+                  <p>{exp.description}</p>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+
+          <section id='contact' className='mb-12'>
+            <SectionTitle>LET'S CONNECT</SectionTitle>
+            <div className='p-6 border-2 border-black'>
+              <p className='mb-4'>
+                Ready to collaborate on your next big project? Let's turn your ideas into
+                reality!
+              </p>
+              <div className='flex flex-wrap justify-center gap-4'>
+                {['GitHub', 'LinkedIn', 'Twitter', 'Email'].map((platform) => (
+                  <RetroButton key={platform} onClick={() => window.open('#', '_blank')}>
+                    {platform}
+                  </RetroButton>
+                ))}
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <footer className='pb-4 mt-12 text-center'>
+          <p>© {new Date().getFullYear()} John Doe | Crafted with ❤️ and a lot of ☕</p>
+        </footer>
+      </div>
+    </div>
+  );
+};
+
+export default ExpandedRetroDevPortfolio;

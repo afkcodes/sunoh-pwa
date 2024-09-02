@@ -1,12 +1,13 @@
 const baseURL = 'https://sunoh-api.vercel.app';
-const proxyImageURL = 'https://sunoh-api.vercel.app/proxy?url=';
 // 'http://localhost:3600';
+const proxyImageURL = 'https://sunoh-api.vercel.app/proxy?url=';
 const endpoints = {
   saavn: {
     home: `${baseURL}/saavn`,
     modules: `${baseURL}/modules`,
     album: `${baseURL}/saavn/album`,
     playlist: `${baseURL}/saavn/playlist`,
+    artist: `${baseURL}/saavn/artist`,
     mix: `${baseURL}/saavn/mix`,
     createStation: `${baseURL}/saavn/create_station`,
     getStationSongs: `${baseURL}/saavn/get_station_songs`,

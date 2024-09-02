@@ -1,59 +1,78 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Fragment, useEffect, useRef, useState } from 'react';
-import { LuChevronLeft, LuHeart, LuMoreVertical, LuShuffle } from 'react-icons/lu';
+import { Fragment, useCallback, useRef } from 'react';
+import { LuHeart, LuMoreVertical, LuShuffle } from 'react-icons/lu';
 import { RiPauseMiniFill, RiPlayMiniFill, RiShareForwardLine } from 'react-icons/ri';
-import { useParams } from 'wouter';
+import { useLocation, useParams } from 'wouter';
+import ActionHeader from '~components/ActionHeader';
 import Button from '~components/Button/Button';
 import Figure from '~components/Figure/Figure';
+import Section from '~components/Section/Section';
 import TextLink from '~components/TextLink/TextLink';
+import { componentConfig } from '~configs/component.config';
 import { dataConfigs } from '~configs/data.config';
 import AudioItemContainer from '~containers/AudioItemContainer';
 import AudioStateContainer from '~containers/AudioStateContainer';
+import { createMediaTrack } from '~helper/common';
 import { mediaActions } from '~helper/mediaActions';
 import useFetch from '~hooks/useFetch';
+import { useQueryParams } from '~hooks/useQueryParams';
 import useScrollToTop from '~hooks/useScrollToTop';
 import { endpoints } from '~network/endpoints';
 import http from '~network/http';
+import { audio } from '~states/audioStore';
 
 const AlbumScreen: React.FC = () => {
-  const { scrollY } = useScroll();
   const { albumId } = useParams();
   const containerRef = useRef<HTMLDivElement>(null);
-  const albumTitleRef = useRef<HTMLHeadingElement>(null);
-  const imageScale = useTransform(scrollY, [0, 300], [1, 1.2]);
-  const imageY = useTransform(scrollY, [0, 300], [0, -50]);
-  const imageOpacity = useTransform(scrollY, [0, 300], [1, 0.3]);
-  const [isHeaderVisible, setIsHeaderVisible] = useState(false);
+  const type = useQueryParams().getQueryParam('type');
+  console.log('Rendering', type);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (albumTitleRef.current) {
-        const titlePosition = albumTitleRef.current.getBoundingClientRect().top;
-        setIsHeaderVisible(titlePosition < 0);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const togglePlay = () => {};
-
-  const { data, isLoading } = useFetch({
+  const { data: albumData, isLoading } = useFetch({
     queryKey: [`album_${albumId}`],
     queryFn: async () => await http(`${endpoints.saavn.album}/${albumId}`),
   });
-
-  useScrollToTop();
+  const { scrollY } = useScroll();
+  const [, navigate] = useLocation();
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const imageScale = useTransform(scrollY, [0, 300], [1, 1.2]);
+  const imageY = useTransform(scrollY, [0, 300], [0, -50]);
+  const imageOpacity = useTransform(scrollY, [0, 300], [1, 0.3]);
+  const togglePlay = () => {};
+  const data = albumData?.album;
 
   const onShuffle = () => {
     mediaActions.shuffle(data, '160kbps');
   };
 
   const onPlayAll = () => {
+    console.log(data);
     mediaActions.playAll(data, '160kbps');
   };
 
+  const play = (item: any) => {
+    const mediaTrack = createMediaTrack(item, '160kbps');
+    audio.addMediaAndPlay(mediaTrack);
+  };
+
+  const onClick = useCallback(
+    (category: string, token: string, item: any) => {
+      const routes: Record<string, string> = {
+        album: `/album/${token}`,
+        playlist: `/playlist/${token}`,
+        mix: `/playlist/${token}?category=mix`,
+        artist: `/artist/${token}`,
+      };
+      if (category === 'song') {
+        play(item);
+      } else {
+        navigate(routes[category] || '/');
+      }
+    },
+
+    [navigate]
+  );
+
+  useScrollToTop();
   return (
     <Fragment>
       {isLoading ? (
@@ -62,36 +81,9 @@ const AlbumScreen: React.FC = () => {
         <div
           ref={containerRef}
           className='relative min-h-screen overflow-x-hidden bg-background'>
-          <motion.div
-            initial={{ opacity: 0, y: 0 }}
-            animate={{
-              opacity: isHeaderVisible ? 1 : 0,
-              y: isHeaderVisible ? 0 : -20,
-            }}
-            transition={{ duration: 0.3 }}
-            className='fixed top-0 left-0 right-0 z-20 flex justify-between py-3 bg-surface bg-opacity-70 backdrop-blur-md'>
-            <Button
-              variant='unstyled'
-              classNames='p-0 m-0 transition-all duration-300 active:scale-90 pl-4'
-              size='md'
-              radius='full'
-              onClick={togglePlay}>
-              <LuChevronLeft size={24} />
-            </Button>
-            <div className='text-center'>
-              <TextLink weight='medium' size='md'>
-                {data?.title}
-              </TextLink>
-            </div>
-            <Button
-              variant='unstyled'
-              classNames='p-0 m-0 transition-all duration-300 active:scale-90 pr-3.5'
-              size='md'
-              radius='full'
-              onClick={togglePlay}>
-              <LuMoreVertical size={24} />
-            </Button>
-          </motion.div>
+          {data && (
+            <ActionHeader ref={titleRef} title={data.title} onMoreClick={() => {}} />
+          )}
           <motion.div
             className='relative overflow-hidden h-96'
             style={{
@@ -104,8 +96,8 @@ const AlbumScreen: React.FC = () => {
               }}
               className='absolute top-0 left-0 w-full h-full bg-center bg-cover'>
               <Figure
-                src={[data?.images[2]?.link]}
-                alt={data?.title}
+                src={[data.images[2]?.link]}
+                alt={data.title}
                 fit='cover'
                 size='full'
                 radius='none'
@@ -115,16 +107,16 @@ const AlbumScreen: React.FC = () => {
           </motion.div>
 
           <div className='relative px-2 py-2'>
-            <div ref={albumTitleRef} className='flex flex-col px-2 mb-4'>
+            <div ref={titleRef} className='flex flex-col px-2 mb-4'>
               <TextLink size='xl' weight='semibold'>
-                {data?.title}
+                {data.title}
               </TextLink>
               <div className='flex flex-col gap-0.5'>
                 <TextLink size='base' color='light'>
-                  {data?.subtitle}
+                  {data.subtitle}
                 </TextLink>
                 <TextLink size='sm' color='tertiary'>
-                  {data?.description}
+                  {data.description}
                 </TextLink>
               </div>
             </div>
@@ -132,7 +124,7 @@ const AlbumScreen: React.FC = () => {
             <div className='flex items-center justify-between px-2'>
               <div className='flex items-start gap-4'>
                 <TextLink size='sm' color='tertiary'>
-                  {data?.listCount && Number(data?.listCount) > 1
+                  {data.listCount && Number(data?.listCount) > 1
                     ? `${data?.listCount} songs`
                     : `${data?.listCount} song`}
                 </TextLink>
@@ -192,6 +184,52 @@ const AlbumScreen: React.FC = () => {
                   type: 'indexed',
                 }}
               />
+            </div>
+
+            <div className='space-y-4'>
+              {albumData.sections.map((section: any, idx: number) => {
+                return (
+                  <Section
+                    key={idx}
+                    headerConfig={{
+                      textLinkConfig: componentConfig.headerConfig,
+                      actionButtonConfig: {
+                        ...componentConfig.headerActionButtonConfig,
+                        onClick: () => {},
+                        children: 'More',
+                      },
+                    }}
+                    data={section}
+                    config={
+                      section.data[0].type === 'song'
+                        ? dataConfigs.audio
+                        : dataConfigs.album
+                    }
+                    containerConfig={{
+                      tileContainerConfig: {
+                        layout: section.data[0].type === 'song' ? 'list' : 'scrollList',
+                        onTileClick: onClick,
+                        tileConfig:
+                          section?.data?.[0]?.type === 'song'
+                            ? {
+                                figureConfig: { fit: 'cover', size: 'xs' },
+                                titleConfig: { size: 'sm', weight: 'medium' },
+                                subTitleConfig: { size: 'xs' },
+                              }
+                            : {
+                                ...componentConfig.albumTileConfig,
+                                figureConfig: {
+                                  size: 'xl',
+                                  fit: 'cover',
+                                  radius:
+                                    section?.data?.[0]?.type === 'artist' ? 'full' : 'sm',
+                                },
+                              },
+                      },
+                    }}
+                  />
+                );
+              })}
             </div>
           </div>
         </div>

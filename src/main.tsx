@@ -7,7 +7,7 @@ import PWABadge from '~PWABadge';
 import Router from '~router/Router';
 import './index.css';
 
-const queryClient = new QueryClient({
+export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       gcTime: 1000 * 60 * 60 * 3,
@@ -20,13 +20,10 @@ mediaActions.restoreMediaState();
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      {/* <BrowserRouter> */}
       <LazyMotion features={domAnimation}>
         <Router />
         <PWABadge />
       </LazyMotion>
-      {/* </BrowserRouter> */}
-      {/* <ReactQueryDevtools initialIsOpen /> */}
     </QueryClientProvider>
   </React.StrictMode>
 );

@@ -27,12 +27,6 @@ const AudioItem: React.FC<AudioItemProps> = ({
   // const palette = dataExtractor(data, dataConfigs.audio.palette);
 
   const onAudioItemClick = (data: any) => {
-    // setAudioStoreTransient({
-    //   currentTrack: {
-    //     ...getAudioSnapshot().currentTrack,
-    //     palette,
-    //   },
-    // });
     onClick(data);
   };
 
@@ -76,9 +70,11 @@ const AudioItem: React.FC<AudioItemProps> = ({
             </TextLink>
           </div>
           <div className='flex items-center justify-end h-full pr-2 space-x-4'>
-            <TextLink size='sm' color='tertiary'>
-              {timeToReadable(Number(duration))}
-            </TextLink>
+            {duration ? (
+              <TextLink size='sm' color='tertiary'>
+                {timeToReadable(Number(duration))}
+              </TextLink>
+            ) : null}
             <Button
               classNames='text-gray-400 transition-colors active:text-white active:scale-90 p-0 m-0'
               variant='unstyled'

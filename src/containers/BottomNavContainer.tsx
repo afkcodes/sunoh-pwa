@@ -2,6 +2,7 @@ import { useLocation } from 'wouter';
 import Button from '~components/Button/Button';
 import TextLink from '~components/TextLink/TextLink';
 import { NavItems, navItems } from '~constants/navigation';
+import { searchStoreSnapshot } from '~states/search.store';
 
 const BottomNavContainer = () => {
   const [location, navigate] = useLocation();
@@ -20,6 +21,11 @@ const BottomNavContainer = () => {
             variant='unstyled'
             classNames='w-full'
             onClick={() => {
+              if (item.name === 'search') {
+                const searchState = searchStoreSnapshot();
+                onClick(`${item.path}?q=${searchState.query}&cat=${searchState.key}`);
+                return;
+              }
               onClick(item.path);
             }}>
             <div className='flex flex-col items-center justify-center'>

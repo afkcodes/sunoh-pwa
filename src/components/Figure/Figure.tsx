@@ -15,6 +15,7 @@ const Figure: React.FC<FigureProps> = ({
   dominantColor = '',
   mode = 'single',
   position = 'center',
+  shouldUseObserver = true,
 }) => {
   const className = merge(
     figureStyles({ radius, size }),
@@ -26,7 +27,7 @@ const Figure: React.FC<FigureProps> = ({
   return (
     <figure className={className} tabIndex={0} style={{ backgroundColor: dominantColor }}>
       {mode === 'single' ? (
-        <Observer observerOption={{ threshold: 0 }}>
+        <Observer observerOption={{ threshold: 0 }} shouldObserve={shouldUseObserver}>
           <Image
             src={sourceImages as string}
             alt={alt}

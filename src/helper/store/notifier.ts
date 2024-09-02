@@ -1,4 +1,7 @@
+/* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { diffChecker } from './createStore';
 
 /**
  * Represents the ChangeNotifier module.
@@ -26,7 +29,7 @@ export type ListenerCallback<T> = (
   data: T,
   actionSet: ActionSet,
   prevState: T,
-  transient: boolean
+  transient?: boolean
 ) => void;
 
 /**
@@ -91,7 +94,7 @@ class ChangeNotifier<T> {
    */
   notify(
     eventName: string,
-    data: T,
+    data: Partial<T>,
     sliceName: string,
     transient: boolean = false,
     caller: string = 'notifier_default'
@@ -117,13 +120,16 @@ class ChangeNotifier<T> {
     const prevState = this.notifierState[eventName][sliceName];
     const stateData = checkValidObject(data) ? { ...(prevState || {}), ...data } : data;
 
-    this.notifierState[eventName][sliceName] = stateData;
+    if (!diffChecker(prevState, stateData)) {
+      this.notifierState[eventName][sliceName] = stateData as T;
 
-    sliceListeners.forEach((cb) =>
-      cb(stateData, this.getActionSet(), prevState, transient)
-    );
-
-    // console.log(`Notify called for '${eventName}' by '${caller}', data:`, data);
+      sliceListeners.forEach((cb) =>
+        cb(stateData as T, this.getActionSet(), prevState, transient)
+      );
+      // console.info(`Notify Called for: '${eventName}' by: '${caller}'.`);
+    } else {
+      console.info('notify rejected as the previous state and current state are same.');
+    }
   }
 
   /**
@@ -197,10 +203,19 @@ class ChangeNotifier<T> {
    * @returns {void}
    */
   registerAction(callback: Function, slice: string): void {
-    if (!this.actionSet[slice as keyof typeof this.actionSet]) {
+    if (!this.actionSet[slice]) {
       this.actionSet[slice] = new Set();
     }
     this.actionSet[slice].add(callback);
+  }
+
+  unregisterAction(callback: Function, slice: string): void {
+    if (this.actionSet[slice]) {
+      this.actionSet[slice].delete(callback);
+      if (this.actionSet[slice].size === 0) {
+        delete this.actionSet[slice];
+      }
+    }
   }
 
   /**

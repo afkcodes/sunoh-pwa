@@ -82,50 +82,6 @@ export const typeChecker = (data: any) => {
   return type;
 };
 
-/* eslint-disable no-prototype-builtins */
-type NestedObject = Record<string, any>; // Define a type for nested objects
-
-export const dataExtractor = (obj: NestedObject, key: string): any | null => {
-  if (!(obj instanceof Object)) {
-    // If the provided object is not an instance of Object (i.e., not a valid object), return null
-    return null;
-  }
-
-  const keys = key.split('.'); // Split the key by dot notation to get individual keys
-  let currentObj: NestedObject | any[] | null = obj; // Initialize a variable to keep track of the current object
-
-  for (const k of keys) {
-    if (currentObj === null) {
-      // If current object is null, return null (gracefully handle nested null values)
-      return null;
-    }
-
-    if (Array.isArray(currentObj)) {
-      // If the current object is an array
-      const index = parseInt(k, 10); // Convert the key to an integer (for array index)
-      if (!Number.isNaN(index) && index >= 0 && index < currentObj.length) {
-        // Check if the index is a valid number and within the array length
-        currentObj = currentObj[index]; // Update the current object to the element at the given index
-      } else {
-        return null; // If the index is out of range, return null
-      }
-    } else if (currentObj instanceof Object) {
-      // If the current object is a regular object
-
-      if (currentObj.hasOwnProperty(k)) {
-        // Check if the key exists in the current object
-        currentObj = currentObj[k]; // Update the current object to the value associated with the key
-      } else {
-        return null; // If the key doesn't exist, return null
-      }
-    } else {
-      return null; // If the current object is neither an array nor an object, return null
-    }
-  }
-
-  return currentObj; // Return the final value found after traversing the keys
-};
-
 export const getColorWithOpacity = (hexColor: string, opacity: number): string => {
   // Ensure opacity is within the valid range of 0 to 1
   opacity = Math.min(1, Math.max(0, opacity));
@@ -357,7 +313,7 @@ export function rgbToHex(r: number, g: number, b: number): string {
   );
 }
 
-export function updateStatusBarColor(color: string) {
+export function updateStatusBarColor(color: string, fadeDuration: number = 300) {
   // Update theme-color meta tag
   let metaThemeColor = document.querySelector('meta[name=theme-color]');
   if (!metaThemeColor) {
@@ -365,21 +321,74 @@ export function updateStatusBarColor(color: string) {
     metaThemeColor.setAttribute('name', 'theme-color');
     document.head.appendChild(metaThemeColor);
   }
-  metaThemeColor.setAttribute('content', color);
 
-  // If the app is running in standalone mode (installed PWA)
-  if (isValidWindow) {
-    if (window.matchMedia('(display-mode: standalone)').matches) {
+  // Create or get fade elements
+  let fadeOutElement = document.getElementById('theme-color-fade-out');
+  let fadeInElement = document.getElementById('theme-color-fade-in');
+
+  if (!fadeOutElement) {
+    fadeOutElement = document.createElement('div');
+    fadeOutElement.id = 'theme-color-fade-out';
+    setFadeElementStyle(fadeOutElement);
+    document.body.appendChild(fadeOutElement);
+  }
+
+  if (!fadeInElement) {
+    fadeInElement = document.createElement('div');
+    fadeInElement.id = 'theme-color-fade-in';
+    setFadeElementStyle(fadeInElement);
+    document.body.appendChild(fadeInElement);
+  }
+
+  // Set the new color and start fade out
+  fadeOutElement.style.backgroundColor = metaThemeColor.getAttribute('content') || '';
+  fadeOutElement.style.opacity = '1';
+
+  // After a short delay, start fade in of new color
+  setTimeout(() => {
+    fadeInElement.style.backgroundColor = color;
+    fadeInElement.style.opacity = '1';
+
+    // Update meta tag and other platform-specific elements
+    metaThemeColor.setAttribute('content', color);
+    updatePlatformSpecificColors(color);
+
+    // Reset fade elements after transition
+    setTimeout(() => {
+      fadeOutElement.style.opacity = '0';
+      fadeInElement.style.opacity = '0';
+    }, fadeDuration);
+  }, 50); // Small delay before fade in starts
+
+  function setFadeElementStyle(element: HTMLElement) {
+    Object.assign(element.style, {
+      position: 'fixed',
+      top: '0',
+      left: '0',
+      right: '0',
+      height: '0',
+      zIndex: '999999',
+      transition: `opacity ${fadeDuration}ms ease`,
+      opacity: '0',
+    });
+  }
+
+  function updatePlatformSpecificColors(color: string) {
+    if (
+      typeof window !== 'undefined' &&
+      window.matchMedia('(display-mode: standalone)').matches
+    ) {
+      const userAgent = navigator.userAgent.toLowerCase();
+
       // For Android
-      if (navigator.userAgent.toLowerCase().includes('android')) {
-        // @ts-ignore: Typescript might not recognize this API
-        if (window.NavigationBar) {
-          // @ts-ignore
-          window.NavigationBar.setColor(color);
+      if (userAgent.includes('android')) {
+        if ((window as any).NavigationBar) {
+          (window as any).NavigationBar.setColor(color);
         }
       }
+
       // For iOS
-      if (navigator.userAgent.toLowerCase().includes('iphone')) {
+      if (userAgent.includes('iphone')) {
         document.documentElement.style.setProperty('--pwa-status-bar-color', color);
       }
     }
@@ -400,15 +409,17 @@ const iconMap: { [key: string]: React.ComponentType<any> } = {
 };
 
 export const categoryCreator = (categories: string[]) => {
-  const updatedCategories = ['all', ...categories].filter((item) => item !== 'topquery');
+  const updatedCategories = ['all', ...categories].filter(
+    (c) => c !== 'topquery' && c != null
+  );
   const categoryObj = updatedCategories.map((category) => {
     return {
       id: category,
       name: capitalizeFirstLetter(category),
-      icon: iconMap[category],
+      icon: iconMap?.[category] ? iconMap?.[category] : null,
     };
   });
-  return categoryObj;
+  return categoryObj as any;
 };
 
 // Debounce function in TypeScript
@@ -424,3 +435,95 @@ export function debounce<F extends (...args: any[]) => any>(func: F, waitFor: nu
 
   return debounced as (...args: Parameters<F>) => ReturnType<F>;
 }
+
+export function addUniqueObject(
+  array: any[],
+  object: any,
+  key: string,
+  maxLength: number = 12
+) {
+  // Check if an object with the same key value already exists in the array
+  const exists = array.some((item) => item[key] === object[key]);
+
+  // If the object doesn't already exist, perform the operations
+  if (!exists) {
+    // If the array length is already at maxLength, remove the last element
+    if (array.length >= maxLength) {
+      array.pop();
+    }
+    // Add the new object to the beginning of the array
+    array.unshift(object);
+  }
+
+  return array;
+}
+
+export function formatNumber(number: number) {
+  const suffixes = ['', 'K', 'M', 'B', 'T'];
+  const tier = Math.floor(Math.log10(Math.abs(number)) / 3);
+
+  if (tier === 0) return number.toString();
+
+  const suffix = suffixes[tier];
+  const scale = Math.pow(10, tier * 3);
+  const scaled = number / scale;
+
+  return scaled.toFixed(1).replace(/\.0$/, '') + suffix;
+}
+
+export function formatListeners(input: string): string {
+  const regex = /•\s*(\d+)\s*Listeners/i;
+  const match = input.match(regex);
+
+  if (match && match[1]) {
+    const listeners = parseInt(match[1], 10);
+    const suffixes = ['K', 'M', 'B', 'T'];
+    const tier = Math.floor(Math.log10(listeners) / 3);
+
+    if (tier === 0) return `• ${listeners} Listeners`;
+
+    const suffix = suffixes[tier - 1];
+    const scale = Math.pow(10, tier * 3);
+    const scaled = listeners / scale;
+
+    return `• ${scaled.toFixed(1).replace(/\.0$/, '')}${suffix} Listeners`;
+  }
+
+  return '';
+}
+
+export const createRadioMediaTrack = (data: any): MediaTrack => {
+  // Convert to MediaTrack format
+  const track: Track = {
+    id: data.name,
+    artwork: [
+      {
+        src: data.player_image,
+        name: data.title,
+        sizes: '500x500',
+      },
+      {
+        src: data.player_image,
+        name: data.title,
+        sizes: '150x150',
+      },
+      {
+        src: data.player_image,
+        name: data.title,
+        sizes: '50x50',
+      },
+    ],
+    source: data.streams[0].includes('http://')
+      ? `https://proxy.ashish-kmr.workers.dev?url=${data.streams[0]}`
+      : data.streams[0],
+    title: decodeHtmlEntities(data.name),
+    album: '',
+    artist: data.city,
+    comment: '',
+    duration: 0,
+    genre: '', // Assuming genre is not provided in the given data
+    year: '',
+  };
+
+  return track;
+};

@@ -10,10 +10,16 @@ const BottomSheet = ({
   onClose: () => void;
 }) => {
   return (
-    <Drawer.Root open={isOpen} onClose={onClose}>
+    <Drawer.Root
+      open={isOpen}
+      onClose={() => {
+        setTimeout(() => {
+          onClose();
+        }, 100);
+      }}>
       <Drawer.Portal>
         <Drawer.Overlay className='fixed inset-0 bg-black/40' />
-        <Drawer.Content className='z-50 flex flex-col rounded-t-[10px] mt-24 fixed bottom-0 left-0 right-0'>
+        <Drawer.Content className='fixed bottom-0 left-0 right-0 z-50 flex flex-col border-none outline-none'>
           <Drawer.Title className='sr-only'>sunoh modal</Drawer.Title>
           <Drawer.Description className='sr-only'>
             Bottom Sheet Content Main

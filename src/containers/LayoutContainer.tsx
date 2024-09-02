@@ -28,6 +28,8 @@ import { usePathname } from 'wouter/use-browser-location';
 
 export const LayoutContainer = ({ children }: any) => {
   const location = usePathname();
+  console.log('re-rendering Layout');
+
   return (
     <div className='min-h-screen bg-background pb-36 text-text-primary'>
       <m.div

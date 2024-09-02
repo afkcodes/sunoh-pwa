@@ -1,7 +1,8 @@
-import { Fragment } from 'react';
+import { Fragment, memo } from 'react';
 import { useLocation } from 'wouter';
 import { componentConfig } from '~configs/component.config';
 import { dataConfigs } from '~configs/data.config';
+import RecentlyPlayedContainer from '~containers/RecentlyPlayedContainer';
 import SectionContainer from '~containers/SectionContainer';
 import { mediaActions } from '~helper/mediaActions';
 import useFetch from '~hooks/useFetch';
@@ -36,17 +37,20 @@ const Home = () => {
     }
   };
 
-  const onActionHeaderClick = () => {
-    navigate(`/radio`);
+  const onActionHeaderClick = (key: string) => {
+    navigate(`/view-all?key=${key}`);
   };
 
+  const filtered = data?.filter((d: any) => d?.heading) ?? [];
+  console.log('re-rendering home');
   return (
     <Fragment>
       {isSuccess ? (
         <div className='flex flex-col gap-3 '>
+          <RecentlyPlayedContainer />
           <SectionContainer
             onItemClick={onClick}
-            data={data}
+            data={filtered}
             containerConfig={{
               tileContainerConfig: {
                 onTileClick: onClick,
@@ -74,4 +78,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default memo(Home);

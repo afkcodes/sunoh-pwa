@@ -1,195 +1,442 @@
-// import { motion, useScroll, useTransform } from 'framer-motion';
-// import { useEffect, useRef, useState } from 'react';
-// import { LuChevronLeft, LuMoreVertical, LuPlay } from 'react-icons/lu';
-// import AudioItem from '~components/AudioItem/AudioItem';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { useCallback, useRef } from 'react';
+import { LuHeart, LuMoreVertical, LuShuffle } from 'react-icons/lu';
+import { RiPauseMiniFill, RiPlayMiniFill, RiShareForwardLine } from 'react-icons/ri';
+import { Fragment } from 'react/jsx-runtime';
+import { useLocation, useParams } from 'wouter';
+import ActionHeader from '~components/ActionHeader';
+import Button from '~components/Button/Button';
+import Figure from '~components/Figure/Figure';
+import Section from '~components/Section/Section';
+import TextLink from '~components/TextLink/TextLink';
+import { componentConfig } from '~configs/component.config';
+import { dataConfigs } from '~configs/data.config';
+import AudioStateContainer from '~containers/AudioStateContainer';
+import { createMediaTrack, formatNumber } from '~helper/common';
+import { mediaActions } from '~helper/mediaActions';
+import useFetch from '~hooks/useFetch';
+import useScrollToTop from '~hooks/useScrollToTop';
+import { endpoints } from '~network/endpoints';
+import http from '~network/http';
+import { audio } from '~states/audioStore';
+
+const ArtistScreen = () => {
+  useScrollToTop();
+  const [, navigate] = useLocation();
+  const { scrollY } = useScroll();
+  const y = useTransform(scrollY, [0, 500], [0, -150]);
+  const { artistId } = useParams();
+  const titleRef = useRef<HTMLHeadingElement>(null);
+
+  const { data, isSuccess } = useFetch({
+    queryKey: [`artist_${artistId}`],
+    queryFn: async () => await http(`${endpoints.saavn.artist}/${artistId}`),
+  });
+
+  const play = (item: any) => {
+    const mediaTrack = createMediaTrack(item, '160kbps');
+    audio.addMediaAndPlay(mediaTrack);
+  };
+
+  const onShuffle = (audioData: any) => {
+    console.log(audioData);
+    mediaActions.shuffle({ id: artistId, list: audioData }, '160kbps');
+  };
+
+  const onPlayAll = (audioData: any) => {
+    mediaActions.playAll({ id: artistId, list: audioData }, '160kbps');
+  };
+
+  const onClick = useCallback(
+    (category: string, token: string, item: any) => {
+      const routes: Record<string, string> = {
+        album: `/album/${token}`,
+        playlist: `/playlist/${token}`,
+        mix: `/playlist/${token}?category=mix`,
+        artist: `/artist/${token}`,
+      };
+      if (category === 'song') {
+        play(item);
+      } else {
+        navigate(routes[category] || '/');
+      }
+    },
+
+    [navigate]
+  );
+
+  return (
+    <Fragment>
+      {isSuccess ? (
+        <div className='min-h-screen text-white bg-black'>
+          <motion.div
+            className='fixed top-0 left-0 w-full overflow-hidden h-96'
+            style={{ y }}>
+            <Figure
+              src={[data.images[2].link]}
+              alt={data.name}
+              size='full'
+              position='top'
+              fit='cover'
+              radius='none'
+            />
+            <div className='absolute inset-0 bg-gradient-to-b from-transparent to-background' />
+          </motion.div>
+          <ActionHeader ref={titleRef} title={data.title} onMoreClick={() => {}} />
+          <div className='relative z-10 min-h-screen pt-96'>
+            <div className='container pt-2 mx-auto bg-background'>
+              <div className='px-2 my-4' ref={titleRef}>
+                <TextLink size='xxl' weight='bold'>
+                  {data.title}
+                </TextLink>
+                <TextLink size='sm' color='light'>
+                  {formatNumber(Number(data.followers))} Followers
+                </TextLink>
+              </div>
+              {/* Controls */}
+              <div className='flex items-center justify-between px-2'>
+                <div className='flex items-start gap-4'>
+                  <Button
+                    variant='unstyled'
+                    onClick={() => {}}
+                    classNames='p-0 m-0 transition-all duration-300 active:scale-90'>
+                    <RiShareForwardLine size={22} />
+                  </Button>
+                  <Button
+                    variant='unstyled'
+                    onClick={() => {}}
+                    classNames='p-0 m-0 transition-all duration-300 active:scale-90'>
+                    <LuMoreVertical size={22} />
+                  </Button>
+                </div>
+                <div className='flex gap-4'>
+                  <Button
+                    variant='unstyled'
+                    onClick={() => {}}
+                    classNames='p-0 m-0 transition-all duration-300 active:scale-90'>
+                    <LuHeart size={22} />
+                  </Button>
+                  <Button
+                    variant='unstyled'
+                    size='md'
+                    radius='sm'
+                    onClick={() => {
+                      onShuffle(data?.sections?.[0]?.data);
+                    }}
+                    classNames='p-0 transition-all duration-300 active:scale-90'>
+                    <LuShuffle size={22} />
+                  </Button>
+                  <AudioStateContainer
+                    renderItem={(audioState) => (
+                      <Button
+                        variant='primary'
+                        classNames='transition-all duration-300  p-2 active:scale-90'
+                        radius='full'
+                        size='md'
+                        onClick={() => {
+                          onPlayAll(data?.sections?.[0]?.data);
+                        }}>
+                        {audioState.playbackState === 'playing' &&
+                        audioState.currentPlaybackSource === artistId ? (
+                          <RiPauseMiniFill size={38} fill='white' stroke='2' />
+                        ) : (
+                          <RiPlayMiniFill fill='white' size={38} />
+                        )}
+                      </Button>
+                    )}
+                  />
+                </div>
+              </div>
+
+              <div className='space-y-4'>
+                {data.sections.map((section: any, idx: number) => {
+                  return (
+                    <Section
+                      key={idx}
+                      headerConfig={{
+                        textLinkConfig: componentConfig.headerConfig,
+                        actionButtonConfig: {
+                          ...componentConfig.headerActionButtonConfig,
+                          onClick: () => {},
+                          children: 'More',
+                        },
+                      }}
+                      data={section}
+                      config={
+                        section.data[0].type === 'song'
+                          ? dataConfigs.audio
+                          : dataConfigs.album
+                      }
+                      containerConfig={{
+                        tileContainerConfig: {
+                          layout: section.data[0].type === 'song' ? 'list' : 'scrollList',
+                          onTileClick: onClick,
+                          tileConfig:
+                            section?.data?.[0]?.type === 'song'
+                              ? {
+                                  figureConfig: { fit: 'cover', size: 'xs' },
+                                  titleConfig: { size: 'sm', weight: 'medium' },
+                                  subTitleConfig: { size: 'xs' },
+                                }
+                              : {
+                                  ...componentConfig.albumTileConfig,
+                                  figureConfig: {
+                                    size: 'xl',
+                                    fit: 'cover',
+                                    radius:
+                                      section?.data?.[0]?.type === 'artist'
+                                        ? 'full'
+                                        : 'sm',
+                                  },
+                                },
+                        },
+                      }}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div>Loading</div>
+      )}
+    </Fragment>
+  );
+};
+
+export default ArtistScreen;
+
+// import { Play } from 'lucide-react';
+// import { useEffect, useState } from 'react';
+// import { LuHeart, LuMoreVertical, LuShuffle } from 'react-icons/lu';
+// import { RiPauseMiniFill, RiPlayMiniFill, RiShareForwardLine } from 'react-icons/ri';
 // import Button from '~components/Button/Button';
 // import Figure from '~components/Figure/Figure';
 // import TextLink from '~components/TextLink/TextLink';
-// import { dataConfigs } from '~configs/data.config';
+// import AudioStateContainer from '~containers/AudioStateContainer';
 
-// const artist = {
-//   name: 'Cosmic Drift',
-//   image:
-//     'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-//   bio: 'Cosmic Drift is an electronic music producer known for their ethereal soundscapes and futuristic beats.',
-// };
-
-// const albums = [
-//   {
-//     id: 1,
-//     title: 'Stellar Whispers',
-//     year: '2023',
-//     tracks: 12,
-//     image:
-//       'https://images.unsplash.com/photo-1614149162883-504ce4d13909?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80',
-//   },
-//   {
-//     id: 2,
-//     title: 'Nebula Dreams',
-//     year: '2021',
-//     tracks: 10,
-//     image:
-//       'https://images.unsplash.com/photo-1535727118629-331b2982b88b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1176&q=80',
-//   },
-// ];
-
-// const popularTracks = [
-//   { id: 1, title: 'Quantum Leap', subtitle: 'Stellar Whispers', duration: '324' },
-//   { id: 2, title: 'Astral Projection', subtitle: 'Nebula Dreams', duration: '287' },
-//   { id: 3, title: 'Galactic Lullaby', subtitle: 'Stellar Whispers', duration: '356' },
-//   { id: 4, title: 'Cosmic Dust', subtitle: 'Nebula Dreams', duration: '301' },
-// ];
-
-// const relatedArtists = [
-//   {
-//     id: 1,
-//     name: 'Electro Nova',
-//     image:
-//       'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-//   },
-//   {
-//     id: 2,
-//     name: 'Nebula Noise',
-//     image:
-//       'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-//   },
-// ];
-
-// const ArtistScreen = () => {
-//   const containerRef = useRef(null);
-//   const { scrollY } = useScroll({
-//     target: containerRef,
-//     offset: ['start start', 'end start'],
-//   });
-//   const imageScale = useTransform(scrollY, [0, 200], [1, 0.8]);
-//   const titleRef = useRef(null);
-//   const [isHeaderVisible, setIsHeaderVisible] = useState(false);
+// export default function Component() {
+//   const [scrollY, setScrollY] = useState(0);
 
 //   useEffect(() => {
 //     const handleScroll = () => {
-//       if (titleRef.current) {
-//         const titlePosition = titleRef.current.getBoundingClientRect().top;
-//         setIsHeaderVisible(titlePosition < 0);
-//       }
+//       setScrollY(window.scrollY);
 //     };
-
-//     window.addEventListener('scroll', handleScroll, { passive: true });
-//     return () => window.removeEventListener('scroll', handleScroll);
+//     window.addEventListener('scroll', handleScroll);
+//     return () => {
+//       window.removeEventListener('scroll', handleScroll);
+//     };
 //   }, []);
 
 //   return (
-//     <div
-//       ref={containerRef}
-//       className='relative min-h-screen overflow-y-auto text-white bg-background'>
-//       <motion.div
-//         initial={{ opacity: 0, y: 0 }}
-//         animate={{
-//           opacity: isHeaderVisible ? 1 : 0,
-//           y: isHeaderVisible ? 0 : -20,
-//         }}
-//         transition={{ duration: 0.3 }}
-//         className='fixed top-0 left-0 right-0 z-20 flex justify-between px-2 py-3 bg-surface bg-opacity-70 backdrop-blur-md'>
-//         <Button
-//           variant='unstyled'
-//           classNames='p-0 m-0 transition-all duration-300 active:scale-90'
-//           size='md'
-//           radius='full'
-//           onClick={() => {}}>
-//           <LuChevronLeft size={24} />
-//         </Button>
-//         <div className='text-center'>
-//           <TextLink weight='medium' size='md'>
-//             {artist.name}
-//           </TextLink>
+//     <div className='flex flex-col min-h-screen text-white bg-background'>
+//       <div className='relative overflow-hidden h-96'>
+//         <div
+//           style={{
+//             transform: `translateY(${scrollY * 0.5}px)`,
+//           }}>
+//           <Figure
+//             alt='Cyber Dreamers band performing live'
+//             src={[
+//               'https://images.news18.com/ibnlive/uploads/2024/03/untitled-design-29-2024-03-7fc38571c58e961820dc00db0c41505b.png?impolicy=website&width=640&height=480',
+//             ]}
+//             fit='cover'
+//             size='full'
+//             radius='none'
+//           />
 //         </div>
-//         <Button
-//           variant='unstyled'
-//           classNames='p-0 m-0 transition-all duration-300 active:scale-90'
-//           size='md'
-//           radius='full'
-//           onClick={() => {}}>
-//           <LuMoreVertical size={24} />
-//         </Button>
-//       </motion.div>
 
-//       <div className='relative z-10 min-h-screen pt-3'>
-//         <div className='flex flex-col items-center p-4 mb-8'>
-//           <div className='absolute top-0 left-0 right-0 opacity-30 blur-md'>
-//             <Figure src={[artist.image]} alt={artist.name} fit='cover' size='full' />
+//         <div className='absolute inset-0 bg-black bg-opacity-30' />
+//         <div className='absolute bottom-0 left-0 p-6'>
+//           <h1 className='mb-2 text-4xl font-bold'>Cyber Dreamers</h1>
+//           <p className='text-xl text-zinc-300'>Electronic • Synthwave • Cyberpunk</p>
+//         </div>
+//       </div>
+//       {/* <div className='sticky top-0 z-10 bg-zinc-900 bg-opacity-90 backdrop-blur-md'>
+//         <div className='flex items-center justify-between p-4'>
+//           <Button variant='dark' classNames='text-white'>
+//             <svg
+//               xmlns='http://www.w3.org/2000/svg'
+//               width='24'
+//               height='24'
+//               viewBox='0 0 24 24'
+//               fill='none'
+//               stroke='currentColor'
+//               strokeWidth='2'
+//               strokeLinecap='round'
+//               strokeLinejoin='round'
+//               className='w-6 h-6'>
+//               <polyline points='15 18 9 12 15 6' />
+//             </svg>
+//             <span className='sr-only'>Back</span>
+//           </Button>
+//           <div className='flex space-x-2'>
+//             <Button
+//               variant='dark'
+//               classNames='bg-emerald-500 hover:bg-emerald-600 text-white'>
+//               Play
+//               <Play className='w-4 h-4 ml-2' />
+//             </Button>
+//             <Button variant='outline' size='sm'>
+//               <Heart className='w-4 h-4' />
+//               <span className='sr-only'>Follow</span>
+//             </Button>
+//             <Button variant='dark' size='sm'>
+//               <MoreHorizontal className='w-6 h-6' />
+//               <span className='sr-only'>More options</span>
+//             </Button>
 //           </div>
-//           <div>
-//             <motion.div
-//               style={{ scale: imageScale }}
-//               className='w-64 h-64 mb-4 overflow-hidden rounded-full shadow-2xl'>
-//               <Figure src={[artist.image]} alt={artist.name} fit='cover' size='full' />
-//             </motion.div>
-//           </div>
-//           <h1 ref={titleRef} className='mb-2 text-4xl font-bold text-center'>
-//             {artist.name}
-//           </h1>
-//           <p className='mb-4 text-center text-gray-300'>{artist.bio}</p>
+//         </div>
+//       </div> */}
+
+//       <div className='flex items-center justify-between px-2 mt-4'>
+//         <div className='flex items-start gap-4'>
+//           <TextLink size='sm' color='tertiary'>
+//             {/* {data?.listCount && Number(data?.listCount) > 1
+//               ? `${data?.listCount} songs`
+//               : `${data?.listCount} song`} */}
+//             asd
+//           </TextLink>
 //           <Button
-//             variant='dark'
-//             classNames='px-8 py-2 bg-primary text-white rounded-full'
-//             size='lg'
-//             onClick={() => {}}>
-//             <LuPlay className='mr-2' /> Play
+//             variant='unstyled'
+//             onClick={() => {}}
+//             classNames='p-0 m-0 transition-all duration-300 active:scale-90'>
+//             <RiShareForwardLine size={22} />
+//           </Button>
+//           <Button
+//             variant='unstyled'
+//             onClick={() => {}}
+//             classNames='p-0 m-0 transition-all duration-300 active:scale-90'>
+//             <LuMoreVertical size={22} />
 //           </Button>
 //         </div>
-
-//         <div className='px-4 mb-8'>
-//           <h2 className='mb-4 text-2xl font-semibold'>Albums</h2>
-//           <div className='flex pb-4 space-x-4 overflow-x-auto'>
-//             {albums.map((album) => (
-//               <div key={album.id} className='flex-shrink-0 w-40'>
-//                 <Figure src={[album.image]} alt={album.title} fit='cover' size='full' />
-//                 <h3 className='font-medium'>{album.title}</h3>
-//                 <p className='text-sm text-gray-400'>
-//                   {album.year} • {album.tracks} tracks
-//                 </p>
-//               </div>
-//             ))}
-//           </div>
+//         <div className='flex gap-4'>
+//           <Button
+//             variant='unstyled'
+//             onClick={() => {}}
+//             classNames='p-0 m-0 transition-all duration-300 active:scale-90'>
+//             <LuHeart size={22} />
+//           </Button>
+//           <Button
+//             variant='unstyled'
+//             size='md'
+//             radius='sm'
+//             onClick={() => {}}
+//             classNames='p-0 transition-all duration-300 active:scale-90'>
+//             <LuShuffle size={22} />
+//           </Button>
+//           <AudioStateContainer
+//             renderItem={(audioState) => (
+//               <Button
+//                 variant='primary'
+//                 classNames='transition-all duration-300  p-2 active:scale-90'
+//                 radius='full'
+//                 size='md'
+//                 onClick={() => {}}>
+//                 {audioState.playbackState === 'playing' &&
+//                 audioState.currentPlaybackSource === 'data.id' ? (
+//                   <RiPauseMiniFill size={38} fill='white' stroke='2' />
+//                 ) : (
+//                   <RiPlayMiniFill fill='white' size={38} />
+//                 )}
+//               </Button>
+//             )}
+//           />
 //         </div>
-
-//         <div className='px-4 mb-8'>
-//           <h2 className='mb-4 text-2xl font-semibold'>Popular</h2>
-//           <div className='space-y-2'>
-//             {popularTracks.map((track, index) => (
-//               <AudioItem
-//                 key={track.id}
-//                 data={track}
-//                 config={dataConfigs.audio}
-//                 isPlaying={false}
-//                 index={index + 1}
-//                 currentProgress={0}
-//                 type='indexed'
-//                 onClick={() => {}}
-//                 onOptionsClick={() => {}}
-//               />
-//             ))}
-//           </div>
-//         </div>
-
-//         <div className='px-4 mb-8'>
-//           <h2 className='mb-4 text-2xl font-semibold'>Related Artists</h2>
-//           <div className='flex pb-4 space-x-4 overflow-x-auto'>
-//             {relatedArtists.map((relatedArtist) => (
-//               <div key={relatedArtist.id} className='flex-shrink-0 w-32 text-center'>
-//                 <Figure
-//                   src={[relatedArtist.image]}
-//                   alt={relatedArtist.name}
-//                   fit='cover'
-//                   size='full'
-//                 />
-//                 <h3 className='text-sm font-medium'>{relatedArtist.name}</h3>
-//               </div>
-//             ))}
-//           </div>
+//       </div>
+//       <div>
+//         <div className='py-6 space-y-8'>
+//           <section>
+//             <h2 className='mb-4 text-2xl font-semibold'>Popular Tracks</h2>
+//             <ul className='space-y-2'>
+//               {[
+//                 'Neon Lights',
+//                 'Digital Sunset',
+//                 'Hologram Heart',
+//                 'Quantum Love',
+//                 'Cyber Dreams',
+//               ].map((track, index) => (
+//                 <li
+//                   key={index}
+//                   className='flex items-center justify-between p-2 transition-colors rounded-md hover:bg-zinc-800'>
+//                   <div className='flex items-center'>
+//                     <img
+//                       alt={`${track} album cover`}
+//                       className='w-12 h-12 mr-4 rounded-md'
+//                       src={`/placeholder.svg?height=48&width=48&text=${track.replace(
+//                         ' ',
+//                         '+'
+//                       )}`}
+//                     />
+//                     <div>
+//                       <p className='font-medium'>{track}</p>
+//                       <p className='text-sm text-zinc-400'>Cyber Dreamers</p>
+//                     </div>
+//                   </div>
+//                   <Button variant='dark' size='sm'>
+//                     <Play className='w-4 h-4' />
+//                     <span className='sr-only'>Play {track}</span>
+//                   </Button>
+//                 </li>
+//               ))}
+//             </ul>
+//           </section>
+//           <section>
+//             <h2 className='mb-4 text-2xl font-semibold'>Albums</h2>
+//             <div className='grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4'>
+//               {[
+//                 'Cyberpunk Dreams',
+//                 'Neon Nights',
+//                 'Digital Horizons',
+//                 'Synthetic Emotions',
+//               ].map((album, index) => (
+//                 <div key={index} className='space-y-2'>
+//                   <img
+//                     alt={`${album} album cover`}
+//                     className='object-cover w-full rounded-md aspect-square'
+//                     src={`/placeholder.svg?height=200&width=200&text=${album.replace(
+//                       ' ',
+//                       '+'
+//                     )}`}
+//                   />
+//                   <p className='font-medium truncate'>{album}</p>
+//                   <p className='text-sm text-zinc-400'>2023</p>
+//                 </div>
+//               ))}
+//             </div>
+//           </section>
+//           <section>
+//             <h2 className='mb-4 text-2xl font-semibold'>About</h2>
+//             <p className='text-zinc-300'>
+//               Cyber Dreamers is an electronic music duo known for their futuristic
+//               soundscapes and pulsating rhythms. Blending elements of synthwave and
+//               cyberpunk, their music transports listeners to neon-lit cityscapes of
+//               tomorrow.
+//             </p>
+//           </section>
+//           <section>
+//             <h2 className='mb-4 text-2xl font-semibold'>Related Artists</h2>
+//             <div className='flex pb-4 space-x-4 overflow-x-auto'>
+//               {['Neon Pulse', 'Synth Riders', 'Digital Horizon', 'Pixel Waves'].map(
+//                 (artist, index) => (
+//                   <div key={index} className='flex-none w-32'>
+//                     <img
+//                       alt={`${artist} artist photo`}
+//                       className='object-cover w-32 h-32 mb-2 rounded-full'
+//                       src={`/placeholder.svg?height=128&width=128&text=${artist.replace(
+//                         ' ',
+//                         '+'
+//                       )}`}
+//                     />
+//                     <p className='text-sm font-medium text-center truncate'>{artist}</p>
+//                   </div>
+//                 )
+//               )}
+//             </div>
+//           </section>
 //         </div>
 //       </div>
 //     </div>
 //   );
-// };
-
-// export default ArtistScreen;
+// }

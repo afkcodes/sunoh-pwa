@@ -16,8 +16,8 @@ const TileContainer: React.FC<TileContainerProps> = ({
       {layout === 'scrollList' ? (
         <ScrollSnap>
           {isValidArray(data) &&
-            data.slice(0, 10).map((item: any) => (
-              <div className='relative snap-center' key={item.title}>
+            data.slice(0, 25).map((item: any, index: number) => (
+              <div className='relative snap-center' key={`${item.id}_${index}`}>
                 <Suspense fallback={<div>TILE</div>}>
                   <Tile
                     {...tileConfig}
@@ -43,7 +43,7 @@ const TileContainer: React.FC<TileContainerProps> = ({
                     config={config}
                     data={item}
                     onClick={() => {
-                      onTileClick(item.type, item.token, item);
+                      onTileClick(item.type, item.token || item.id, item);
                     }}
                   />
                 </Suspense>
@@ -52,17 +52,19 @@ const TileContainer: React.FC<TileContainerProps> = ({
         </ScrollSnap>
       ) : null}
       {layout === 'grid' ? (
-        <div className='grid grid-cols-2'>
+        <div className='grid w-full grid-cols-2 px-2 pt-2 gap-y-4 gap-x-2'>
           {isValidArray(data) &&
-            data.slice(0, 10).map((item: any) => (
-              <div key={item.title}>
+            data.map((item: any, index: number) => (
+              <div
+                key={item.id ? item.id : index}
+                className={`${index % 2 !== 0 ? 'justify-self-end h-full w-full ' : ''}`}>
                 <Suspense fallback={<div>TILE</div>}>
                   <Tile
                     {...tileConfig}
                     config={config}
                     data={item}
                     onClick={() => {
-                      onTileClick(item.type, item.token, item);
+                      onTileClick(item.type, item.token || item.id, item);
                     }}
                   />
                 </Suspense>
@@ -73,16 +75,17 @@ const TileContainer: React.FC<TileContainerProps> = ({
       {layout === 'list' ? (
         <div className='flex flex-col space-y-3'>
           {isValidArray(data) &&
-            data.slice(0, 10).map((item: any) => (
-              <div key={item.title}>
+            data.map((item: any) => (
+              <div key={item.id}>
                 <Suspense fallback={<div>TILE</div>}>
                   <Tile
                     {...tileConfig}
                     config={config}
                     data={item}
                     onClick={() => {
-                      onTileClick(item.type, item.token, item);
+                      onTileClick(item.type, item.token || item.id, item);
                     }}
+                    variant='list'
                   />
                 </Suspense>
               </div>
