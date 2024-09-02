@@ -20,7 +20,7 @@ const Tile: React.FC<TileProps> = ({
   return (
     <Button
       variant='unstyled'
-      classNames='z-0 flex flex-col items-start transition-all duration-300 active:scale-95 p-0 m-0'
+      classNames='z-0 flex flex-col items-start transition-all duration-300 active:scale-90 p-0 m-0'
       onClick={onClick}>
       <Figure {...figureConfig} src={images} alt={alt} />
       <div className='py-0.5 flex flex-col items-start'>

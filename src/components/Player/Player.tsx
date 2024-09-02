@@ -93,14 +93,14 @@ const PlayerScreen = () => {
         <Button
           onClick={() => {}}
           variant='unstyled'
-          classNames='transition-colors text-text-primary active:text-text-primary active:scale-95 p-0 m-0'>
+          classNames='transition-colors text-text-primary active:text-text-primary active:scale-90 p-0 m-0'>
           <RiListUnordered size={24} />
         </Button>
         <span className='text-sm font-medium'>NOW PLAYING</span>
         <Button
           onClick={() => {}}
           variant='unstyled'
-          classNames='p-0 m-0 transition-colors text-text-primary active:text-text-primary active:scale-95'>
+          classNames='p-0 m-0 transition-colors text-text-primary active:text-text-primary active:scale-90'>
           <RiMusic2Line size={24} />
         </Button>
       </div>
@@ -139,11 +139,11 @@ const PlayerScreen = () => {
                 {trackData?.artist || 'Artist Name'}
               </TextLink>
             </div>
-            <div data-vaul-no-drag className={showLyrics ? 'hidden' : 'flex flex-col'}>
+            <div className={showLyrics ? 'hidden' : 'flex flex-col'}>
               <Button
                 variant='unstyled'
                 size='md'
-                classNames={`transition-colors ${
+                classNames={`transition-all active:scale-90 ${
                   isFavorite ? 'text-primary-light' : 'text-text-secondary'
                 }`}
                 onClick={toggleFavorite}>
@@ -153,7 +153,7 @@ const PlayerScreen = () => {
                 onClick={() => {}}
                 variant='unstyled'
                 size='md'
-                classNames='transition-colors text-text-secondary active:text-text-primary active:scale-95 '>
+                classNames='transition-all duration-300 text-text-secondary active:text-text-primary active:scale-90'>
                 <RiShareForwardLine size={28} />
               </Button>
             </div>
@@ -198,7 +198,7 @@ const PlayerScreen = () => {
       {/* Main Controls */}
       <div className='flex items-center justify-center mb-8 space-x-6'>
         <button
-          className={` active:text-text-primary active:scale-95 transition-colors ${
+          className={` active:text-text-primary active:scale-90 transition-colors ${
             isShuffleOn ? 'text-primary-light' : 'text-text-secondary'
           }`}
           onClick={toggleShuffle}>
@@ -224,7 +224,7 @@ const PlayerScreen = () => {
           <RiSkipForwardFill size={36} />
         </Button>
         <button
-          className={` active:text-text-primary active:scale-95 transition-colors relative
+          className={` active:text-text-primary active:scale-90 transition-colors relative
             ${repeatMode > 0 ? 'text-primary-light' : 'text-text-secondary'}`}
           onClick={toggleRepeat}>
           {repeatMode === 2 ? <RiRepeatOneLine size={24} /> : <RiRepeatLine size={24} />}
@@ -238,7 +238,7 @@ const PlayerScreen = () => {
         <div className='flex'>
           <Button
             variant='unstyled'
-            classNames='p-0 m-0 transition-colors text-text-secondary active:text-text-primary active:scale-95'
+            classNames='p-0 m-0 transition-all text-text-secondary active:text-text-primary active:scale-90'
             onClick={toggleLyrics}>
             {showLyrics ? <MdLyrics size={24} /> : <MdOutlineLyrics size={24} />}
           </Button>
@@ -246,7 +246,7 @@ const PlayerScreen = () => {
           <Button
             onClick={toggleMute}
             variant='unstyled'
-            classNames='p-0 ml-6 text-text-secondary active:text-text-primary active:scale-95'>
+            classNames='p-0 ml-6 transition-all text-text-secondary active:text-text-primary active:scale-90'>
             {isMuted ? <RiVolumeMuteLine size={24} /> : <RiVolumeUpLine size={24} />}
           </Button>
         </div>
@@ -274,10 +274,8 @@ const PlayerScreen = () => {
               setIsJamming(!isJamming);
             }}
             variant='unstyled'
-            classNames={`transition-colors p-0 mr-6 ${
-              isJamming
-                ? 'text-primary-default'
-                : 'text-text-secondary active:text-text-primary active:scale-95'
+            classNames={`p-0 mr-6 transition-all text-text-secondary active:text-text-primary active:scale-90 ${
+              isJamming ? 'text-primary-default' : ''
             }`}>
             <RiRfidLine size={24} />
           </Button>
@@ -286,7 +284,7 @@ const PlayerScreen = () => {
               setIsQueueVisible(true);
             }}
             variant='unstyled'
-            classNames='transition-colors text-text-secondary active:text-text-primary active:scale-95 p-0 m-0'>
+            classNames='transition-all text-text-secondary active:text-text-primary active:scale-90 p-0 m-0'>
             <RiPlayList2Fill size={22} />
           </Button>
         </div>
